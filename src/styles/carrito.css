@@ -1,0 +1,44 @@
+/* Carrito */
+.tabla-carrito {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--color-texto);
+  --bs-table-border-color: var(--superficie);
+}
+ 
+.table.tabla-carrito > :not(caption) > * > * {
+  padding: 0.75rem 0.5rem;
+}
+ 
+.tabla-carrito th {
+  color: #FFFFFF;
+  font-family: var(--fuente-titulos);
+  font-weight: 600;
+}
+ 
+.tabla-carrito .boton-secundario {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+}
+ 
+/* Resumen (tarjeta de la derecha) */
+.resumen-carrito {
+  background: var(--superficie);
+  border-radius: var(--radio-borde);
+  padding: 1.5rem;
+}
+ 
+.formulario-cupon .campo-formulario {
+  flex: 1;
+  margin-bottom: 0;
+}
+ 
+.totales-carrito {
+  margin-bottom: 1.5rem;
+}
+ 
+.boton-ir-checkout {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
