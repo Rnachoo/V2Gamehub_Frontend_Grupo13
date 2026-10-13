@@ -6,11 +6,14 @@ import './styles/tema.css'
 import './index.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import App from './App.jsx'
+import { CarritoProvider } from './context/CarritoContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <CarritoProvider>
+        <App />
+      </CarritoProvider>
     </BrowserRouter>
   </StrictMode>,
 )
