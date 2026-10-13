@@ -774,64 +774,7 @@ input, select, textarea {
 }
 
 
-/* ===== Carrito ===== */
-
-.tabla-carrito {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1.5rem;
-}
-
-.tabla-carrito th,
-.tabla-carrito td {
-  text-align: left;
-  padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid var(--superficie);
-}
-
-.tabla-carrito th {
-  color: #FFFFFF;
-  font-family: var(--fuente-titulos);
-  font-weight: 600;
-}
-
-
-.tabla-carrito .boton-secundario {
-  padding: 0.35rem 0.8rem;
-  font-size: 0.85rem;
-}
-
-.carrito-acciones {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 2rem;
-}
-
-
-.resumen-carrito {
-  background: var(--superficie);
-  border-radius: var(--radio-borde);
-  padding: 1.5rem;
-  max-width: 400px;
-  margin-left: auto;
-}
-
-#formulario-cupon {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-#formulario-cupon .campo-formulario {
-  flex: 1;
-  margin-bottom: 0;
-}
-
-.totales-carrito {
-  margin-bottom: 1.5rem;
-}
+/* ===== Totales (compartido: Carrito y Checkout) ===== */
 
 .fila-total {
   display: flex;
@@ -853,30 +796,6 @@ input, select, textarea {
   font-weight: 700;
   font-size: 1.15rem;
   color: #FFFFFF;
-}
-
-#boton-ir-checkout {
-  display: block;
-  width: 100%;
-  text-align: center;
-  text-decoration: none;
-}
-
-#carrito-vacio {
-  padding: 2rem 0;
-  text-align: center;
-}
-
-@media (max-width: 700px) {
-  .tabla-carrito {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  .resumen-carrito {
-    max-width: none;
-  }
 }
 
 
