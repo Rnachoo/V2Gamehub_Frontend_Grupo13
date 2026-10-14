@@ -35,8 +35,6 @@ export default function Carrito() {
 
   return (
     <div className="contenedor">
-      <h1>Tu Carrito</h1>
-
       {lineas.length > 0 && (
         <div className="table-responsive">
           <table className="table tabla-carrito align-middle" aria-label="Productos en tu carrito">

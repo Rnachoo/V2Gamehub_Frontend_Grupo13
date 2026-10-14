@@ -7,11 +7,9 @@ import {
   contarUnidades
 } from '../utils/carrito'
 
-// Mismas claves que en EP1
 const CLAVE_CARRITO = 'gamehub_carrito'
 const CLAVE_CUPON = 'gamehub_cupon'
 
-// Lee y parsea localStorage; si no hay nada o está dañado, devuelve el valor por defecto
 function leerAlmacenamiento(clave, valorPorDefecto) {
   try {
     const datos = localStorage.getItem(clave)
@@ -25,11 +23,9 @@ function leerAlmacenamiento(clave, valorPorDefecto) {
 const CarritoContext = createContext(null)
 
 export function CarritoProvider({ children }) {
-  // El estado nace desde localStorage, así el carrito sobrevive a una recarga
   const [lineas, setLineas] = useState(() => leerAlmacenamiento(CLAVE_CARRITO, []))
   const [cupon, setCupon] = useState(() => leerAlmacenamiento(CLAVE_CUPON, null))
 
-  // Cada vez que cambian las líneas o el cupón, se guardan
   useEffect(() => {
     localStorage.setItem(CLAVE_CARRITO, JSON.stringify(lineas))
   }, [lineas])
@@ -61,7 +57,6 @@ export function CarritoProvider({ children }) {
   const guardarCupon = (nuevoCupon) => setCupon(nuevoCupon)
   const quitarCupon = () => setCupon(null)
 
-  // Valores derivados: se calculan en cada render a partir del estado
   const totales = calcularTotales(lineas, cupon)
   const unidades = contarUnidades(lineas)
 
