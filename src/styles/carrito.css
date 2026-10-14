@@ -19,6 +19,10 @@
   padding: 0.35rem 0.8rem;
   font-size: 0.85rem;
 }
+
+.tabla-carrito input { 
+  margin-bottom: 0; 
+}
  
 /* Resumen (tarjeta de la derecha) */
 .resumen-carrito {
@@ -29,6 +33,10 @@
  
 .formulario-cupon .campo-formulario {
   flex: 1;
+  margin-bottom: 0;
+}
+
+.formulario-cupon input {
   margin-bottom: 0;
 }
  

@@ -24,10 +24,3 @@ export const CUPONES = [
     fechaFin: "2028-12-31"
   }
 ];
-
-// Función para buscar un cupón por su código
-function buscarCupon(codigo) {
-  if (!codigo) return null;
-  const codigoNormalizado = codigo.trim().toUpperCase();
-  return CUPONES.find((cupon) => cupon.codigo === codigoNormalizado) || null;
-}
