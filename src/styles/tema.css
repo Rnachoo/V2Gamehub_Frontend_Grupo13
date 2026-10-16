@@ -207,7 +207,7 @@ input, select, textarea {
             rgba(18, 24, 31, 0.82) 55%,
             rgba(18, 24, 31, 0.45)
         ),
-        url("../images/portada-inicio.jpg") center / cover no-repeat;
+        url("../assets/portada-inicio.jpg") center / cover no-repeat;
 }
 
 .contenido-hero-inicio {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import FiltroCatalogo from '../components/FiltroCatalogo.jsx'
 import ListaProductos from '../components/ListaProductos.jsx'
 import { useCarrito } from '../context/CarritoContext.jsx'
@@ -20,13 +20,20 @@ const FILTROS_VACIOS = {
 }
 
 export default function Catalogo() {
+  const [parametros, setParametros] = useSearchParams()
+
+  const filtrosIniciales = {
+    ...FILTROS_VACIOS,
+    categoria: parametros.get('categoria') || ''
+  }
+
   const [productos, setProductos] = useState([])
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [errorCarga, setErrorCarga] = useState('')
   const [errorPrecios, setErrorPrecios] = useState('')
-  const [filtros, setFiltros] = useState(FILTROS_VACIOS)
-  const [filtrosAplicados, setFiltrosAplicados] = useState(FILTROS_VACIOS)
+  const [filtros, setFiltros] = useState(filtrosIniciales)
+  const [filtrosAplicados, setFiltrosAplicados] = useState(filtrosIniciales)
   const [cantidadVisible, setCantidadVisible] = useState(PRODUCTOS_POR_CARGA)
   const [orden, setOrden] = useState('destacados')
   const { lineas, agregar } = useCarrito()
@@ -71,6 +78,7 @@ export default function Catalogo() {
 
     setErrorPrecios('')
     setFiltrosAplicados({ ...filtros })
+    setParametros(filtros.categoria ? { categoria: filtros.categoria } : {})
     setCantidadVisible(PRODUCTOS_POR_CARGA)
   }
 
@@ -78,6 +86,7 @@ export default function Catalogo() {
   function limpiarFiltros() {
     setFiltros({ ...FILTROS_VACIOS })
     setFiltrosAplicados({ ...FILTROS_VACIOS })
+    setParametros({})
     setErrorPrecios('')
     setCantidadVisible(PRODUCTOS_POR_CARGA)
     setOrden('destacados')
@@ -174,7 +183,10 @@ export default function Catalogo() {
           alLimpiar={limpiarFiltros}
         />
 
-        <section className="resultados-catalogo" aria-labelledby="titulo-productos">
+        <section
+          className="resultados-catalogo"
+          aria-labelledby="titulo-productos"
+        >
           <div className="barra-resultados">
             <h2 id="titulo-productos">Productos</h2>
 
