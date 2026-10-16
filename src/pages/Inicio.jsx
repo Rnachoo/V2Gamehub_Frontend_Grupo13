@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import ListaProductos from '../components/ListaProductos.jsx'
+import CarruselDestacados from '../components/CarruselDestacados.jsx'
 import { useCarrito } from '../context/CarritoContext.jsx'
 import { obtenerCategorias } from '../services/categorias.js'
 import { obtenerProductos } from '../services/productos.js'
@@ -45,11 +45,6 @@ export default function Inicio() {
   const categoriasPopulares = CATEGORIAS_POPULARES
     .map((id) => categorias.find((categoria) => categoria.id === id))
     .filter(Boolean)
-
-  // Función para elegir hasta cuatro productos destacados
-  const productosDestacados = productos
-    .filter((producto) => producto.destacado)
-    .slice(0, 4)
 
   // Función para agregar un producto sin superar su stock
   function agregarProducto(producto) {
@@ -135,8 +130,8 @@ export default function Inicio() {
       >
         <div className="cabecera-seccion-inicio">
           <div>
-            <p className="etiqueta-seccion">Recomendados para ti</p>
-            <h2 id="titulo-destacados">Productos destacados</h2>
+            <p className="etiqueta-seccion">Descubre más</p>
+            <h2 id="titulo-destacados">Explora productos</h2>
           </div>
 
           <Link to="/catalogo" className="boton-secundario">
@@ -144,8 +139,8 @@ export default function Inicio() {
           </Link>
         </div>
 
-        <ListaProductos
-          productos={productosDestacados}
+        <CarruselDestacados
+          productos={productos}
           lineas={lineas}
           onAgregar={agregarProducto}
         />
