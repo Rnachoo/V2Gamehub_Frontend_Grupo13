@@ -1076,10 +1076,6 @@ input, select, textarea {
     text-align: center;
 }
 
-.mensaje-exito[hidden] {
-    display: none;
-}
-
 .campo-formulario {
     margin-bottom: 1.25rem;
 }
