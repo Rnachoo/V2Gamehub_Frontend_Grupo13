@@ -207,7 +207,7 @@ input, select, textarea {
             rgba(18, 24, 31, 0.82) 55%,
             rgba(18, 24, 31, 0.45)
         ),
-        url("../images/portada-inicio.jpg") center / cover no-repeat;
+        url("../assets/portada-inicio.jpg") center / cover no-repeat;
 }
 
 .contenido-hero-inicio {
@@ -311,6 +311,63 @@ input, select, textarea {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+/* Carrusel de productos */
+
+.carrusel-destacados {
+    margin: 0 auto 4rem;
+    padding: 0 3rem;
+}
+
+.carrusel-grupo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    min-width: 0;
+}
+
+.carrusel-tarjeta {
+    display: flex;
+    min-width: 0;
+}
+
+.carrusel-tarjeta .tarjeta-producto {
+    flex: 1;
+}
+
+.carrusel-destacados .carousel-control-prev,
+.carrusel-destacados .carousel-control-next {
+    width: 2.5rem;
+}
+
+@media (max-width: 850px) {
+    .carrusel-grupo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .carrusel-tarjeta:nth-child(n+3) {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .carrusel-destacados {
+        padding: 0 2rem;
+    }
+
+    .carrusel-grupo {
+        grid-template-columns: 1fr;
+    }
+
+    .carrusel-tarjeta:nth-child(n+2) {
+        display: none;
+    }
+
+    .carrusel-destacados .carousel-control-prev,
+    .carrusel-destacados .carousel-control-next {
+        width: 2rem;
+    }
 }
 
 /* Video de Inicio */
