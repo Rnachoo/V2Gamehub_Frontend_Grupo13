@@ -47,23 +47,4 @@ export const RESENAS = [
     comentario: "Buena resolución y colores, algo de retraso en modo competitivo.",
     fecha: "2024-10-05"
   }
-];
-
-//Retorna solo las reseñas de un producto específico
-function obtenerResenasPorProducto(idProducto) {
-  return RESENAS.filter((resena) => resena.idProducto === idProducto);
-}
-
-
-//Mas claro el agua
-function ordenarResenasPorFecha(listaResenas) {
-  return [...listaResenas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-}
-
-
-//Retorna la ponderación de las reseñas de un producto específico
-function calcularPromedioResenas(listaResenas) {
-  if (!listaResenas || listaResenas.length === 0) return 0;
-  const suma = listaResenas.reduce((acumulado, resena) => acumulado + resena.calificacion, 0);
-  return suma / listaResenas.length;
-}
+];  
