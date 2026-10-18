@@ -4,5 +4,7 @@ module.exports = {
     ['@babel/preset-env', { targets: 'defaults' }],
     ['@babel/preset-react', { runtime: 'automatic' }]
   ],
-  plugins: ['istanbul']
+  plugins: [
+    ['istanbul', { exclude: ['**/*.spec.js', '**/*.spec.jsx', '**/node_modules/**'] }]
+  ]
 }
