@@ -800,7 +800,7 @@ input, select, textarea {
 #titulo-checkout { margin-top: 1rem; }
 .separador-resumen { border: 0; border-top: 1px solid rgba(199, 213, 224, 0.2); margin: 1rem 0; }
 
-.mensaje-exito-error {
+.mensaje-exito.mensaje-exito-error {
     color: var(--color-error);
     background: rgba(255, 107, 107, 0.15);
     border-color: var(--color-error);
@@ -856,9 +856,14 @@ input, select, textarea {
 .item-resumen-checkout {
     display: flex;
     justify-content: space-between;
+    gap: 1rem;
     margin-bottom: 0.8rem;
     font-size: 0.95rem;
     color: var(--color-texto);
+}
+
+.item-resumen-checkout span:last-child {
+    white-space: nowrap;
 }
 
 .panel-resumen-checkout .fila-total-final {
@@ -880,7 +885,6 @@ input, select, textarea {
     
     .panel-resumen-checkout {
         position: static;
-        order: -1; 
         margin-bottom: 2rem;
     }
 }
