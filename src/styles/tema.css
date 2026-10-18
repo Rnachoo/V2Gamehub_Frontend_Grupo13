@@ -800,7 +800,7 @@ input, select, textarea {
 #titulo-checkout { margin-top: 1rem; }
 .separador-resumen { border: 0; border-top: 1px solid rgba(199, 213, 224, 0.2); margin: 1rem 0; }
 
-.mensaje-exito-error {
+.mensaje-exito.mensaje-exito-error {
     color: var(--color-error);
     background: rgba(255, 107, 107, 0.15);
     border-color: var(--color-error);
@@ -856,9 +856,14 @@ input, select, textarea {
 .item-resumen-checkout {
     display: flex;
     justify-content: space-between;
+    gap: 1rem;
     margin-bottom: 0.8rem;
     font-size: 0.95rem;
     color: var(--color-texto);
+}
+
+.item-resumen-checkout span:last-child {
+    white-space: nowrap;
 }
 
 .panel-resumen-checkout .fila-total-final {
@@ -880,7 +885,6 @@ input, select, textarea {
     
     .panel-resumen-checkout {
         position: static;
-        order: -1; 
         margin-bottom: 2rem;
     }
 }
@@ -917,7 +921,7 @@ input, select, textarea {
     border-radius: var(--radio-borde);
     padding: 1.5rem;
     border: 1px solid rgba(199, 213, 224, 0.1);
-    transition: transform 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
 .tarjeta-orden:hover {
@@ -935,7 +939,7 @@ input, select, textarea {
     margin-bottom: 1rem;
 }
 
-.datos-orden h3 {
+.datos-orden h2 {
     margin-bottom: 0.25rem;
     font-size: 1.25rem;
 }
@@ -977,6 +981,7 @@ input, select, textarea {
 
 .productos-orden {
     list-style: none;
+    padding: 0;
     flex: 1;
     min-width: 250px;
 }
@@ -1073,10 +1078,6 @@ input, select, textarea {
     margin-top: 1rem;
     font-weight: 600;
     text-align: center;
-}
-
-.mensaje-exito[hidden] {
-    display: none;
 }
 
 .campo-formulario {
