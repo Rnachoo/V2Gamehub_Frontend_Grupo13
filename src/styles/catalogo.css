@@ -1,0 +1,340 @@
+/* ===== Catálogo ===== */
+
+.ruta-navegacion {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.cabecera-catalogo {
+    margin-bottom: 2rem;
+}
+
+.cabecera-catalogo h1 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.etiqueta-seccion {
+    color: var(--color-primario);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+}
+
+.distribucion-catalogo {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    align-items: start;
+    gap: 2rem;
+}
+
+.contenedor-panel-filtros {
+    position: sticky;
+    top: 1rem;
+}
+
+.panel-filtros {
+    background: var(--superficie);
+    border: 1px solid rgba(199, 213, 224, 0.2);
+    border-radius: var(--radio-borde);
+    overflow: hidden;
+}
+
+.panel-filtros summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.panel-filtros summary::-webkit-details-marker {
+    display: none;
+}
+
+.panel-filtros summary h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.panel-filtros summary::after {
+    content: "▼";
+    color: var(--color-primario);
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+
+.panel-filtros[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.panel-filtros[open] summary {
+    border-bottom: 1px solid rgba(199, 213, 224, 0.2);
+}
+
+.contenido-filtros {
+    padding: 1rem;
+}
+
+.encabezado-filtros {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.campo-filtro {
+    margin-bottom: 1rem;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+    margin-bottom: 0;
+}
+
+.grupo-precios {
+    border: 1px solid rgba(199, 213, 224, 0.3);
+    border-radius: var(--radio-borde);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.grupo-precios legend {
+    padding: 0 0.5rem;
+    font-weight: 600;
+}
+
+.campos-precio {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.grupo-precios .mensaje-error:empty::before {
+    content: none;
+}
+
+.campo-stock {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.campo-stock input {
+    width: auto;
+    margin: 0.3rem 0 0;
+    accent-color: var(--color-primario);
+}
+
+.campo-stock label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.resultados-catalogo {
+    min-width: 0;
+}
+
+.barra-resultados {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.barra-resultados h2 {
+    grid-column: 1;
+    margin-bottom: 0;
+}
+
+.barra-resultados p {
+    grid-column: 1;
+    margin-bottom: 0;
+}
+
+.control-orden {
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
+
+.control-orden select {
+    min-width: 220px;
+    margin-bottom: 0;
+}
+
+.resultados-catalogo .grid-productos {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items: stretch;
+}
+
+.tarjeta-producto {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(199, 213, 224, 0.15);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tarjeta-producto:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primario);
+}
+
+.enlace-imagen-producto {
+    position: relative;
+    display: block;
+    height: 220px;
+    padding: 1rem;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.imagen-tarjeta-producto {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.etiqueta-descuento {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    background: var(--color-acento);
+    color: var(--color-grafito);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.contenido-tarjeta-producto {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1rem;
+}
+
+.marca-producto {
+    color: var(--color-primario);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04rem;
+    margin-bottom: 0.4rem;
+}
+
+.contenido-tarjeta-producto h3 {
+    min-height: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.contenido-tarjeta-producto h3 a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.contenido-tarjeta-producto h3 a:hover {
+    color: var(--color-primario);
+}
+
+.stock-producto {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.precios-producto {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    min-height: 2rem;
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+
+.precio-anterior {
+    color: var(--color-texto);
+    font-size: 0.85rem;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.precio-actual {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.acciones-producto {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+}
+
+.acciones-producto .boton-primario,
+.acciones-producto .boton-secundario {
+    width: 100%;
+    text-align: center;
+}
+
+.boton-agregar-producto:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.boton-cargar-mas {
+    display: flex;
+    margin: 2rem auto 0;
+}
+
+.boton-cargar-mas[hidden] {
+    display: none;
+}
+
+.estado-vacio {
+    padding: 3rem 1rem;
+    border: 1px dashed rgba(199, 213, 224, 0.4);
+    border-radius: var(--radio-borde);
+    text-align: center;
+}
+
+.estado-vacio[hidden] {
+    display: none;
+}
+
+@media (max-width: 850px) {
+    .distribucion-catalogo {
+        grid-template-columns: 1fr;
+    }
+
+    .contenedor-panel-filtros {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .barra-resultados {
+        grid-template-columns: 1fr;
+    }
+
+    .control-orden {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .control-orden select {
+        width: 100%;
+    }
+
+    .resultados-catalogo .grid-productos {
+        grid-template-columns: 1fr;
+    }
+}
+
+

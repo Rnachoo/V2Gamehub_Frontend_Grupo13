@@ -1,0 +1,104 @@
+/* ===== Checkout ===== */
+
+#titulo-checkout { margin-top: 1rem; }
+.separador-resumen { border: 0; border-top: 1px solid rgba(199, 213, 224, 0.2); margin: 1rem 0; }
+
+.mensaje-exito.mensaje-exito-error {
+    color: var(--color-error);
+    background: rgba(255, 107, 107, 0.15);
+    border-color: var(--color-error);
+}
+
+.layout-checkout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 1rem;
+    margin-bottom: 4rem;
+}
+
+.seccion-checkout {
+    background: var(--superficie);
+    padding: 2rem;
+    border-radius: var(--radio-borde);
+    margin-bottom: 2rem;
+}
+
+.seccion-checkout h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(199, 213, 224, 0.1);
+}
+
+.grid-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 1.5rem;
+}
+
+.input-ancho-completo {
+    grid-column: 1 / -1;
+}
+
+
+.panel-resumen-checkout {
+    background: var(--superficie);
+    padding: 2rem;
+    border-radius: var(--radio-borde);
+    position: sticky;
+    top: 2rem; 
+}
+
+.panel-resumen-checkout h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+}
+
+.item-resumen-checkout {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    color: var(--color-texto);
+}
+
+.item-resumen-checkout span:last-child {
+    white-space: nowrap;
+}
+
+.panel-resumen-checkout .fila-total-final {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.panel-resumen-checkout .boton-primario {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.05rem;
+}
+
+
+@media (max-width: 900px) {
+    .layout-checkout {
+        grid-template-columns: 1fr;
+    }
+    
+    .panel-resumen-checkout {
+        position: static;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 550px) {
+    .grid-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .seccion-checkout {
+        padding: 1.5rem;
+    }
+}
+

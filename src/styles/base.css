@@ -1,0 +1,109 @@
+/*Reset básico*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  line-height: 1.5;
+}
+
+/*Para que los videos e imagenes se vean siempre bien encuadrados*/
+img, video { 
+    max-width: 100%; 
+    display: block; 
+    height: auto;
+}
+
+a { 
+    color: var(--color-primario); 
+}
+
+h1, h2, h3 {
+  font-family: var(--fuente-titulos);
+  color: #FFFFFF;
+  margin: 0 0 1rem;
+}
+
+p {
+     margin: 0 0 1rem; 
+    }
+
+/*Layout*/
+.contenedor {
+  width: min(1100px, 100% - 2rem);
+  margin-inline: auto;
+}
+
+.grid-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.5rem;
+}
+
+/*Tarjetas*/
+.tarjeta {
+  background: var(--superficie);
+  border-radius: var(--radio-borde);
+  padding: 1rem;
+}
+
+/*Botones*/
+.boton-primario {
+  background: var(--color-primario);
+  color: var(--color-grafito);
+  border: none;
+  border-radius: var(--radio-borde);
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-secundario {
+  background: transparent;
+  border: 1px solid var(--color-primario);
+  color: var(--color-primario);
+  border-radius: var(--radio-borde);
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-primario:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/*Formularios*/
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+input, select, textarea {
+  width: 100%;
+  background: var(--superficie);
+  border: 1px solid var(--color-texto);
+  border-radius: var(--radio-borde);
+  color: var(--color-texto);
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.mensaje-error {
+  color: var(--color-error);
+  font-size: 1rem;
+}
+.mensaje-error::before { content: "!"; }
+.mensaje-error:empty::before { content: none; }
+

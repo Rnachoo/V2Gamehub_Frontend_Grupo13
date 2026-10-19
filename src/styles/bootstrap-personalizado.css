@@ -1,0 +1,16 @@
+:root {
+  --bs-body-bg: var(--fondo);
+  --bs-body-color: var(--color-texto);
+  --bs-primary: var(--color-primario);
+  --bs-primary-rgb: 102, 192, 244;
+  --bs-danger: var(--color-error);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--color-grafito);
+  --bs-btn-bg: var(--color-primario);
+  --bs-btn-border-color: var(--color-primario);
+  --bs-btn-hover-color: var(--color-grafito);
+  --bs-btn-hover-bg: #8ccff8;
+  --bs-btn-hover-border-color: #8ccff8;
+}

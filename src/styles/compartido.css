@@ -1,0 +1,32 @@
+/* ===== Compartido: Producto y Carrito ===== */
+
+.input-cantidad {
+  width: 90px;
+}
+
+
+/* ===== Totales (compartido: Carrito y Checkout) ===== */
+
+.fila-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+}
+
+.fila-total dt,
+.fila-total dd {
+  margin: 0;
+}
+
+
+.fila-total-final {
+  border-top: 1px solid var(--fondo);
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #FFFFFF;
+}
+
+
