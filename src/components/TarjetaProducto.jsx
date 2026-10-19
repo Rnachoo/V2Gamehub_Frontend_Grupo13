@@ -5,7 +5,6 @@ import {
   formatearPrecio
 } from '../utils/precios.js'
 
-// Función para mostrar la tarjeta de un producto
 export default function TarjetaProducto({
   producto,
   onAgregar,
@@ -13,18 +12,21 @@ export default function TarjetaProducto({
 }) {
   const precioActual = obtenerPrecioActual(producto)
   const descuento = calcularPorcentajeDescuento(producto)
+
   const sinStock = producto.stock === 0
   const stockMaximo = cantidadEnCarrito >= producto.stock
   const botonDeshabilitado = sinStock || stockMaximo
 
-  let textoStock = `${producto.stock} unidades disponibles`
+  // La disponibilidad no cambia al agregar al carrito.
+  const textoStock = sinStock
+    ? 'Producto sin stock'
+    : `${producto.stock} unidades disponibles`
+
   let textoBoton = 'Agregar al carrito'
 
   if (sinStock) {
-    textoStock = 'Producto sin stock'
     textoBoton = 'Sin stock'
   } else if (stockMaximo) {
-    textoStock = 'Ya agregaste el stock máximo'
     textoBoton = 'Stock máximo alcanzado'
   }
 
@@ -41,19 +43,28 @@ export default function TarjetaProducto({
           className="imagen-tarjeta-producto"
           loading="lazy"
         />
+
         {descuento > 0 && (
-          <span className="etiqueta-descuento">-{descuento}%</span>
+          <span className="etiqueta-descuento">
+            -{descuento}%
+          </span>
         )}
       </Link>
 
       <div className="contenido-tarjeta-producto">
-        <p className="marca-producto">{producto.marca}</p>
+        <p className="marca-producto">
+          {producto.marca}
+        </p>
 
         <h3>
-          <Link to={`/producto/${producto.id}`}>{producto.nombre}</Link>
+          <Link to={`/producto/${producto.id}`}>
+            {producto.nombre}
+          </Link>
         </h3>
 
-        <p className="stock-producto">{textoStock}</p>
+        <p className="stock-producto">
+          {textoStock}
+        </p>
 
         <div className="precios-producto">
           {producto.precioDescuento != null && (
@@ -61,13 +72,17 @@ export default function TarjetaProducto({
               {formatearPrecio(producto.precio)}
             </span>
           )}
+
           <span className="precio-actual">
             {formatearPrecio(precioActual)}
           </span>
         </div>
 
         <div className="acciones-producto">
-          <Link to={`/producto/${producto.id}`} className="boton-secundario">
+          <Link
+            to={`/producto/${producto.id}`}
+            className="boton-secundario"
+          >
             Ver producto
           </Link>
 

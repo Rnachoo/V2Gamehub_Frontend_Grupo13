@@ -1,51 +1,106 @@
+import { leerProductosActualizados } from './productos.js'
+
 const CLAVE_ORDENES = 'gamehub_ordenes'
 const RETARDO_MS = 200
 
 function leerOrdenes() {
-  try {
-    return JSON.parse(localStorage.getItem(CLAVE_ORDENES)) || []
-  } catch (error) {
-    console.error('No se pudo leer ' + CLAVE_ORDENES + ':', error)
-    return []
-  }
+  return JSON.parse(
+    localStorage.getItem(CLAVE_ORDENES) || '[]'
+  )
 }
 
-// Función para obtener el historial, de la orden más reciente a la más antigua
 function obtenerOrdenes() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(leerOrdenes().reverse())
-    }, RETARDO_MS)
-  })
-}
-
-// Función para registrar una compra a partir del carrito
-function crearOrden(cliente, lineas, totales) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const orden = {
-        id: Math.floor(Math.random() * 90000 + 10000),
-        fecha: new Date().toISOString(),
-        estado: 'En camino',
-        cliente: cliente,
-        productos: lineas.map((linea) => ({
-          productoId: linea.productoId,
-          nombre: linea.nombre,
-          precioUnitario: linea.precioUnitario,
-          cantidad: linea.cantidad
-        })),
-        subtotal: totales.subtotal,
-        descuento: totales.descuento,
-        total: totales.total
+      try {
+        resolve(leerOrdenes().reverse())
+      } catch (error) {
+        reject(error)
       }
-
-      localStorage.setItem(CLAVE_ORDENES, JSON.stringify([...leerOrdenes(), orden]))
-      resolve(orden)
     }, RETARDO_MS)
   })
 }
 
-// Se exportan dentro de un objeto para poder espiarlas con spyOn en las pruebas
+// Registrar esta orden representa confirmar el pago simulado.
+function crearOrden(cliente, lineas, totales) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        if (lineas.length === 0) {
+          throw new Error('El carrito está vacío.')
+        }
+
+        const productos = leerProductosActualizados()
+        const cantidades = new Map()
+
+        // Validar y agrupar las cantidades por producto.
+        for (const linea of lineas) {
+          if (
+            !Number.isInteger(linea.cantidad) ||
+            linea.cantidad <= 0
+          ) {
+            throw new Error(
+              'Hay una cantidad inválida en el carrito.'
+            )
+          }
+
+          cantidades.set(
+            linea.productoId,
+            (cantidades.get(linea.productoId) || 0) +
+              linea.cantidad
+          )
+        }
+
+        // Revisar toda la compra antes de guardar.
+        for (const [productoId, cantidad] of cantidades) {
+          const producto = productos.find(
+            (item) => item.id === productoId
+          )
+
+          if (!producto) {
+            throw new Error(
+              'Uno de los productos ya no existe.'
+            )
+          }
+
+          if (cantidad > producto.stock) {
+            throw new Error(
+              `${producto.nombre}: quedan ${producto.stock} unidades disponibles.`
+            )
+          }
+        }
+
+        const orden = {
+          id: Math.floor(Math.random() * 90000 + 10000),
+          fecha: new Date().toISOString(),
+          estado: 'En camino',
+          cliente,
+          productos: lineas.map((linea) => ({
+            productoId: linea.productoId,
+            nombre: linea.nombre,
+            precioUnitario: linea.precioUnitario,
+            cantidad: linea.cantidad
+          })),
+          subtotal: totales.subtotal,
+          descuento: totales.descuento,
+          total: totales.total
+        }
+
+        // Al guardar la orden, sus unidades pasan a descontarse
+        // cuando se consulta el inventario.
+        localStorage.setItem(
+          CLAVE_ORDENES,
+          JSON.stringify([...leerOrdenes(), orden])
+        )
+
+        resolve(orden)
+      } catch (error) {
+        reject(error)
+      }
+    }, RETARDO_MS)
+  })
+}
+
 export const servicioOrdenes = {
   obtenerOrdenes,
   crearOrden

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { PRODUCTOS } from '../data/datos-productos'
+import { obtenerProductoPorId } from '../services/productos.js'
 import { obtenerResenasPorProducto } from '../services/resenas'
 import { useCarrito } from '../context/CarritoContext'
 import { validarStock } from '../utils/carrito'
@@ -15,8 +15,11 @@ const formatoPeso = new Intl.NumberFormat('es-CL', {
 
 export default function Producto() {
   const id = Number(useParams().id)
-  const producto = PRODUCTOS.find((p) => p.id === id)
   const { lineas, agregar } = useCarrito()
+
+  const [producto, setProducto] = useState(null)
+  const [cargandoProducto, setCargandoProducto] = useState(true)
+  const [errorProducto, setErrorProducto] = useState('')
   const [resenas, setResenas] = useState([])
   const [cantidad, setCantidad] = useState('1')
   const [error, setError] = useState('')
@@ -24,42 +27,104 @@ export default function Producto() {
 
   useEffect(() => {
     let activo = true
+
     obtenerResenasPorProducto(id).then((lista) => {
       if (activo) setResenas(lista)
     })
+
     return () => {
       activo = false
     }
   }, [id])
 
+  useEffect(() => {
+    let activo = true
+
+    setCargandoProducto(true)
+    setErrorProducto('')
+    setProducto(null)
+    setCantidad('1')
+    setError('')
+    setAgregado(false)
+
+    obtenerProductoPorId(id)
+      .then((resultado) => {
+        if (activo) setProducto(resultado)
+      })
+      .catch(() => {
+        if (activo) {
+          setErrorProducto('No se pudo cargar el producto.')
+        }
+      })
+      .finally(() => {
+        if (activo) setCargandoProducto(false)
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [id])
+
+  if (cargandoProducto) {
+    return (
+      <p className="contenedor">
+        Cargando producto...
+      </p>
+    )
+  }
+
+  if (errorProducto) {
+    return (
+      <p className="contenedor" role="alert">
+        {errorProducto}
+      </p>
+    )
+  }
+
   if (!producto) {
     return (
       <div className="contenedor">
         <p className="mt-4">
-          No encontramos ese producto. Vuelve al <Link to="/catalogo">catálogo</Link>.
+          No encontramos ese producto. Vuelve al{' '}
+          <Link to="/catalogo">catálogo</Link>.
         </p>
       </div>
     )
   }
 
   const tieneDescuento =
-    producto.precioDescuento != null && producto.precioDescuento < producto.precio
+    producto.precioDescuento != null &&
+    producto.precioDescuento < producto.precio
+
   const sinStock = producto.stock === 0
 
   function manejarEnvio(evento) {
     evento.preventDefault()
+
     const unidades = Number(cantidad)
 
     if (!Number.isInteger(unidades) || unidades <= 0) {
-      setError('Ingresa una cantidad válida (un número entero mayor a 0).')
+      setError(
+        'Ingresa una cantidad válida (un número entero mayor a 0).'
+      )
       return
     }
 
-    const linea = lineas.find((l) => l.productoId === producto.id)
+    const linea = lineas.find(
+      (item) => item.productoId === producto.id
+    )
+
     const enCarrito = linea ? linea.cantidad : 0
 
     if (!validarStock(producto, unidades + enCarrito)) {
-      setError('Solo quedan ' + (producto.stock - enCarrito) + ' unidades disponibles.')
+      const disponiblesParaAgregar = Math.max(
+        0,
+        producto.stock - enCarrito
+      )
+
+      setError(
+        `Puedes agregar ${disponiblesParaAgregar} unidades más al carrito.`
+      )
       return
     }
 
@@ -71,8 +136,12 @@ export default function Producto() {
 
   return (
     <div className="contenedor">
-      <nav aria-label="Ruta de navegación" className="ruta-navegacion">
-        <Link to="/">Inicio</Link> &gt; <Link to="/catalogo">Catálogo</Link> &gt;{' '}
+      <nav
+        aria-label="Ruta de navegación"
+        className="ruta-navegacion"
+      >
+        <Link to="/">Inicio</Link> &gt;{' '}
+        <Link to="/catalogo">Catálogo</Link> &gt;{' '}
         <span aria-current="page">Producto</span>
       </nav>
 
@@ -92,21 +161,42 @@ export default function Producto() {
 
           <p className="precio">
             {tieneDescuento && (
-              <span className="precio-tachado">{formatoPeso.format(producto.precio)}</span>
+              <span className="precio-tachado">
+                {formatoPeso.format(producto.precio)}
+              </span>
             )}
-            <span className={tieneDescuento ? 'precio-descuento' : undefined}>
-              {formatoPeso.format(tieneDescuento ? producto.precioDescuento : producto.precio)}
+
+            <span
+              className={
+                tieneDescuento
+                  ? 'precio-descuento'
+                  : undefined
+              }
+            >
+              {formatoPeso.format(
+                tieneDescuento
+                  ? producto.precioDescuento
+                  : producto.precio
+              )}
             </span>
           </p>
 
-          <ul className="caracteristicas" aria-label="Características del producto">
+          <ul
+            className="caracteristicas"
+            aria-label="Características del producto"
+          >
             {producto.especificaciones.map((caracteristica) => (
-              <li key={caracteristica}>{caracteristica}</li>
+              <li key={caracteristica}>
+                {caracteristica}
+              </li>
             ))}
           </ul>
 
           <p>
-            Disponibilidad: {producto.stock > 0 ? producto.stock + ' disponibles' : 'Agotado'}
+            Disponibilidad:{' '}
+            {producto.stock > 0
+              ? `${producto.stock} disponibles`
+              : 'Agotado'}
           </p>
 
           <form
@@ -115,7 +205,10 @@ export default function Producto() {
             noValidate
           >
             <div className="campo-formulario">
-              <label htmlFor="cantidad-producto">Cantidad:</label>
+              <label htmlFor="cantidad-producto">
+                Cantidad:
+              </label>
+
               <input
                 type="number"
                 id="cantidad-producto"
@@ -125,17 +218,33 @@ export default function Producto() {
                 max={producto.stock}
                 value={cantidad}
                 disabled={sinStock}
-                onChange={(evento) => setCantidad(evento.target.value)}
+                onChange={(evento) => {
+                  setCantidad(evento.target.value)
+                }}
                 aria-describedby="error-cantidad"
                 aria-invalid={error ? 'true' : undefined}
               />
-              <span id="error-cantidad" className="mensaje-error" role="alert" aria-live="polite">
+
+              <span
+                id="error-cantidad"
+                className="mensaje-error"
+                role="alert"
+                aria-live="polite"
+              >
                 {error}
               </span>
             </div>
 
-            <button type="submit" className="boton-primario" disabled={sinStock}>
-              {sinStock ? 'Sin stock' : agregado ? '¡Agregado!' : 'Agregar al carrito'}
+            <button
+              type="submit"
+              className="boton-primario"
+              disabled={sinStock}
+            >
+              {sinStock
+                ? 'Sin stock'
+                : agregado
+                  ? '¡Agregado!'
+                  : 'Agregar al carrito'}
             </button>
           </form>
         </div>
