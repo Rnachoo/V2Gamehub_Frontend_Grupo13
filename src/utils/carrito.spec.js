@@ -1,4 +1,4 @@
-import { aplicarCupon, cuponVigente, calcularTotal } from './carrito.js'
+import { calcularSubtotal, agregarAlCarrito, validarStock, aplicarCupon, cuponVigente, calcularTotal } from './carrito.js'
 
 describe('aplicarCupon', () => {
   it('calcula el descuento por porcentaje y respeta el tope definido', () => {
@@ -39,5 +39,39 @@ describe('calcularTotal', () => {
     expect(calcularTotal(100000, 100000)).toBe(0)
     // Descuento mayor al subtotal: el total se queda en 0, no baja de ahí
     expect(calcularTotal(50000, 80000)).toBe(0)
+  })
+})
+
+describe('calcularSubtotal', () => {
+  it('suma el precio por la cantidad de todas las líneas', () => {
+    const carrito = [
+      { precioUnitario: 10000, cantidad: 2 },
+      { precioUnitario: 5000, cantidad: 3 }
+    ]
+
+    expect(calcularSubtotal(carrito)).toBe(35000)
+  })
+})
+
+describe('agregarAlCarrito', () => {
+  it('aumenta la cantidad de un producto existente sin duplicarlo', () => {
+    const carrito = [
+      { productoId: 1, nombre: 'Mouse', precioUnitario: 10000, cantidad: 2 }
+    ]
+    const producto = { id: 1, nombre: 'Mouse', precio: 10000 }
+
+    const resultado = agregarAlCarrito(carrito, producto, 1)
+
+    expect(resultado.length).toBe(1)
+    expect(resultado[0].cantidad).toBe(3)
+  })
+})
+
+describe('validarStock', () => {
+  it('impide agregar una cantidad mayor al stock', () => {
+    const producto = { stock: 4 }
+
+    expect(validarStock(producto, 4)).toBeTrue()
+    expect(validarStock(producto, 5)).toBeFalse()
   })
 })
