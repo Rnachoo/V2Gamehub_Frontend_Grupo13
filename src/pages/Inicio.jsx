@@ -145,6 +145,31 @@ export default function Inicio() {
           onAgregar={agregarProducto}
         />
       </section>
+
+      <section
+        className="contenedor seccion-inicio seccion-video"
+        aria-labelledby="titulo-video"
+      >
+        <div className="contenido-video-inicio">
+          <p className="etiqueta-seccion">Vive la experiencia</p>
+          <h2 id="titulo-video">El juego comienza en GameHub</h2>
+          <p>
+            Conoce nuevas formas de jugar y prepara tu espacio con la
+            tecnología que necesitas.
+          </p>
+        </div>
+
+        <div className="video-inicio">
+          <iframe
+            src="https://www.youtube.com/embed/rz1B4B2yBZY"
+            title="Tráiler de Grand Theft Auto VI"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      </section>
     </>
   )
 }
