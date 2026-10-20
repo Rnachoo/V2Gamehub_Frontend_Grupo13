@@ -2,7 +2,9 @@
 ```
 Integrantes: Ignacio Paredes, Marthin Celedon, Facundo Benítez.
 ```
-
+---
+Enlace: https://v2-gamehub-frontend-grupo13.vercel.app/
+---
 <img width="120" height="120" alt="Logotipo GameHub" src="src/assets/logo.png">
 
 GameHub Store es el FrontEnd de una tienda gamer online, migrado a React en esta segunda versión. Sin backend por ahora: los datos salen de servicios simulados que devuelven Promesas y las órdenes se guardan en `localStorage`.
