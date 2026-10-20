@@ -1,4 +1,3 @@
-# GameHub Store · Frontend V2
 
 ```
 Integrantes: Ignacio Paredes, Marthin Celedon, Facundo Benítez.
