@@ -7,7 +7,7 @@ Enlace: https://v2-gamehub-frontend-grupo13.vercel.app/
 
 <img width="120" height="120" alt="Logotipo GameHub" src="src/assets/logo.png">
 
-GameHub Store es el FrontEnd de una tienda gamer online, migrado a React en esta segunda versión. Sin backend por ahora: los datos salen de servicios simulados que devuelven Promesas y las órdenes se guardan en `localStorage`.
+GameHub Store es el FrontEnd de una tienda gamer online en React. Desde EP3 consume los microservicios Spring Boot de GameHub a través del API Gateway (puerto 8080) con autenticación JWT.
 
 * **React + Vite** — componentes con props, estado y contexto para el carrito
 * **Bootstrap 5** — diseño responsivo con la paleta propia
@@ -22,16 +22,26 @@ GameHub Store es el FrontEnd de una tienda gamer online, migrado a React en esta
 | Checkout | `/checkout` |
 | Mis órdenes | `/mis-ordenes` |
 | Crear cuenta | `/crear-cuenta` |
+| Panel de administración (solo ADMIN) | `/panel-admin` |
 
 ## Cómo ejecutar
 
-Requiere Node.js 20.19+ y Google Chrome para las pruebas.
+Requiere Node.js 20.19+, Google Chrome para las pruebas y el backend levantado (Eureka, los 10 microservicios y el Gateway).
 
 ```bash
+cp .env.example .env
 npm install
 npm run dev     # http://localhost:5173
 npm test        # pruebas + cobertura en coverage/html/index.html
 ```
+
+## Variables de entorno
+
+| Variable | Ejemplo | Uso |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:8080/api/v1` | URL base del API Gateway |
+
+El repositorio solo trae `.env.example`; el `.env` real no se sube.
 
 ## Paleta de colores
 
@@ -50,7 +60,8 @@ src/
 ├── context/       CarritoContext
 ├── data/          datos simulados
 ├── pages/         una vista por ruta
-├── services/      acceso a datos con Promesas
+├── hooks/         useCargaDatos
+├── services/      apiClient y acceso a la API REST
 ├── styles/
-└── utils/         carrito, precios y validaciones
+└── utils/         carrito, precios, validaciones y errores
 ```

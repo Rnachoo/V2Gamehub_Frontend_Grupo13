@@ -6,6 +6,7 @@ import Carrito from './pages/Carrito'
 import Checkout from './pages/Checkout'
 import MisOrdenes from './pages/MisOrdenes'
 import CrearCuenta from './pages/CrearCuenta'
+import PanelAdmin from './pages/PanelAdmin'
 import Cabecera from './components/Cabecera'
 import PieDePagina from './components/PieDePagina'
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/mis-ordenes" element={<MisOrdenes />} />
           <Route path="/crear-cuenta" element={<CrearCuenta />} />
+          <Route path="/panel-admin" element={<PanelAdmin />} />
         </Routes>
       </main>
       <PieDePagina />
