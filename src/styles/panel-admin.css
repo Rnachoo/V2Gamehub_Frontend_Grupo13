@@ -1,0 +1,174 @@
+.estado-vista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.estado-vista-error {
+  border: 1px solid var(--color-error);
+  border-radius: var(--radio-borde);
+  color: var(--color-error);
+}
+
+.panel-admin {
+  padding-block: 1.5rem 3rem;
+}
+
+.pestanas-admin {
+  margin-block: 1.25rem;
+  border-bottom-color: rgba(199, 213, 224, 0.25);
+}
+
+.pestanas-admin .nav-link {
+  color: var(--color-texto);
+}
+
+.pestanas-admin .nav-link.active {
+  background: var(--superficie);
+  border-color: rgba(199, 213, 224, 0.25) rgba(199, 213, 224, 0.25) var(--superficie);
+  color: var(--color-primario);
+}
+
+.cabecera-panel-admin {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.formulario-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-block: 1rem 1.5rem;
+  padding: 1.25rem;
+  background: var(--superficie);
+  border-radius: var(--radio-borde);
+}
+
+.formulario-en-linea {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.formulario-en-linea .campo-admin {
+  flex: 1 1 14rem;
+}
+
+.grid-formulario-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.campo-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo-admin .form-control,
+.campo-admin .form-select,
+.tabla-admin .form-select {
+  background-color: var(--fondo);
+  border-color: rgba(199, 213, 224, 0.3);
+  color: var(--color-texto);
+}
+
+.selector-producto-admin {
+  max-width: 28rem;
+  margin-block: 1rem;
+}
+
+.acciones-admin,
+.acciones-tabla {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tabla-admin {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--color-texto);
+  --bs-table-border-color: rgba(199, 213, 224, 0.15);
+}
+
+.etiqueta-estado {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.estado-activo {
+  background: rgba(172, 213, 80, 0.15);
+  color: var(--color-acento);
+}
+
+.estado-inactivo {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--color-error);
+}
+
+.boton-peligro {
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  border-radius: var(--radio-borde);
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mensaje-accion {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radio-borde);
+}
+
+.mensaje-accion-exito {
+  background: rgba(172, 213, 80, 0.12);
+  color: var(--color-acento);
+}
+
+.mensaje-accion-error {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--color-error);
+}
+
+.lista-resenas-admin {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lista-resenas-admin li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--superficie);
+  border-radius: var(--radio-borde);
+}
+
+.lista-resenas-admin p {
+  margin: 0.35rem 0 0;
+}
+
+.resena-oculta {
+  opacity: 0.6;
+}
+
+@media (max-width: 576px) {
+  .lista-resenas-admin li {
+    flex-direction: column;
+  }
+}

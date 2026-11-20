@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import FiltroCatalogo from '../components/FiltroCatalogo.jsx'
+import EstadoVista from '../components/estados/EstadoVista.jsx'
 import ListaProductos from '../components/ListaProductos.jsx'
 import { useCarrito } from '../context/CarritoContext.jsx'
 import { obtenerCategorias } from '../services/categorias.js'
@@ -30,13 +31,20 @@ export default function Catalogo() {
   const [productos, setProductos] = useState([])
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
-  const [errorCarga, setErrorCarga] = useState('')
+  const [errorCarga, setErrorCarga] = useState(null)
+  const [intento, setIntento] = useState(0)
   const [errorPrecios, setErrorPrecios] = useState('')
   const [filtros, setFiltros] = useState(filtrosIniciales)
   const [filtrosAplicados, setFiltrosAplicados] = useState(filtrosIniciales)
   const [cantidadVisible, setCantidadVisible] = useState(PRODUCTOS_POR_CARGA)
   const [orden, setOrden] = useState('destacados')
   const { lineas, agregar } = useCarrito()
+
+  function reintentar() {
+    setCargando(true)
+    setErrorCarga(null)
+    setIntento(intento + 1)
+  }
 
   // Función para cargar productos y categorías al abrir el catálogo
   useEffect(() => {
@@ -47,20 +55,19 @@ export default function Catalogo() {
         if (activo) {
           setProductos(listaProductos)
           setCategorias(listaCategorias)
-          setCargando(false)
         }
       })
-      .catch(() => {
-        if (activo) {
-          setErrorCarga('No se pudo cargar el catálogo.')
-          setCargando(false)
-        }
+      .catch((error) => {
+        if (activo) setErrorCarga(error)
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
       })
 
     return () => {
       activo = false
     }
-  }, [])
+  }, [intento])
 
   // Función para comprobar el rango antes de aplicar los filtros
   function aplicarFiltros() {
@@ -70,6 +77,11 @@ export default function Catalogo() {
     const maximo = filtros.precioMaximo === ''
       ? Infinity
       : Number(filtros.precioMaximo)
+
+    if (minimo < 0 || maximo < 0) {
+      setErrorPrecios('Los precios no pueden ser negativos.')
+      return
+    }
 
     if (minimo > maximo) {
       setErrorPrecios('El precio mínimo no puede superar al máximo.')
@@ -213,45 +225,45 @@ export default function Catalogo() {
             </div>
           </div>
 
-          {cargando && <p>Cargando productos...</p>}
-          {errorCarga && <p role="alert">{errorCarga}</p>}
+          <EstadoVista
+            cargando={cargando}
+            error={errorCarga}
+            textoCarga="Cargando productos..."
+            alReintentar={reintentar}
+          >
+            {productosFiltrados.length > 0 ? (
+              <>
+                <ListaProductos
+                  productos={productosVisibles}
+                  lineas={lineas}
+                  onAgregar={agregarProducto}
+                />
 
-          {!cargando && !errorCarga && (
-            <>
-              {productosFiltrados.length > 0 ? (
-                <>
-                  <ListaProductos
-                    productos={productosVisibles}
-                    lineas={lineas}
-                    onAgregar={agregarProducto}
-                  />
-
-                  {cantidadVisible < productosFiltrados.length && (
-                    <button
-                      type="button"
-                      className="boton-secundario boton-cargar-mas"
-                      onClick={() => setCantidadVisible(
-                        cantidadVisible + PRODUCTOS_POR_CARGA
-                      )}
-                    >
-                      Cargar más productos
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div className="estado-vacio">
-                  <p>No encontramos productos con esos filtros.</p>
+                {cantidadVisible < productosFiltrados.length && (
                   <button
                     type="button"
-                    className="boton-secundario"
-                    onClick={limpiarFiltros}
+                    className="boton-secundario boton-cargar-mas"
+                    onClick={() => setCantidadVisible(
+                      cantidadVisible + PRODUCTOS_POR_CARGA
+                    )}
                   >
-                    Limpiar filtros
+                    Cargar más productos
                   </button>
-                </div>
-              )}
-            </>
-          )}
+                )}
+              </>
+            ) : (
+              <div className="estado-vacio">
+                <p>No encontramos productos con esos filtros.</p>
+                <button
+                  type="button"
+                  className="boton-secundario"
+                  onClick={limpiarFiltros}
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
+          </EstadoVista>
         </section>
       </div>
     </div>
