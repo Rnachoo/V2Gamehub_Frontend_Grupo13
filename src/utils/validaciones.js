@@ -74,9 +74,17 @@ export function validarFormularioCrearCuenta(datos) {
   const resultados = {
     nombre: validarCampoObligatorio(datos.nombre),
     correo: validarCorreo(datos.correo),
+    telefono: validarCampoObligatorio(datos.telefono),
+    region: validarCampoObligatorio(datos.region),
+    comuna: validarCampoObligatorio(datos.comuna),
+    direccion: validarCampoObligatorio(datos.direccion),
     contrasena: validarCampoObligatorio(datos.contrasena),
     confirmarContrasena: validarCoincidenciaContrasenas(datos.contrasena, datos.confirmarContrasena)
   };
+
+  if (resultados.telefono.valido) {
+    resultados.telefono = validarTelefono(datos.telefono);
+  }
 
   if (resultados.contrasena.valido) {
     resultados.contrasena = validarLongitudContrasena(datos.contrasena);
@@ -89,4 +97,21 @@ export function validarFormularioCrearCuenta(datos) {
   }
 
   return { valido: Object.keys(errores).length === 0, errores: errores };
+}
+
+export function validarFormularioLogin(datos) {
+  const errores = {}
+
+  const resultados = {
+    correo: validarCorreo(datos.correo),
+    contrasena: validarCampoObligatorio(datos.contrasena)
+  }
+
+  for (const [campo, resultado] of Object.entries(resultados)) {
+    if (!resultado.valido) {
+      errores[campo] = resultado.mensaje
+    }
+  }
+
+  return { valido: Object.keys(errores).length === 0, errores }
 }
