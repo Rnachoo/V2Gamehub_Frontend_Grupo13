@@ -35,6 +35,30 @@
 
 .nav-principal a { color: var(--color-texto); }
 
+.nav-principal .usuario-sesion {
+  color: var(--color-texto);
+  opacity: 0.85;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boton-cerrar-sesion {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--color-texto);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.boton-cerrar-sesion:hover,
+.boton-cerrar-sesion:focus-visible {
+  color: var(--color-primario);
+}
+
 .footer {
   text-align: center;
   color: var(--color-texto);
