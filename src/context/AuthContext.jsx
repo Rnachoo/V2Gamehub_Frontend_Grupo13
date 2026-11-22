@@ -1,9 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { EVENTO_SESION_EXPIRADA, login, renovarToken, obtenerPerfil } from '../services/authService'
+import {
+  EVENTO_SESION_EXPIRADA,
+  login,
+  renovarToken,
+  obtenerPerfil,
+  crearCuenta,
+  crearPerfil
+} from '../services/authService'
 import { decodificarToken, obtenerExpiracionMs, tokenVencido } from '../utils/jwt'
 
 const CLAVE_SESION = 'gamehub_sesion'
-const MARGEN_RENOVACION_MS = 5 * 60 * 1000 // renueva 5 min antes de expirar
+const MARGEN_RENOVACION_MS = 5 * 60 * 1000 
+//renueva 5 min antes de expirar
 
 function construirSesion(token, usuarioId) {
   const payload = decodificarToken(token)
@@ -36,7 +44,7 @@ export function AuthProvider({ children }) {
   const [sesion, setSesion] = useState(leerSesion)
   const [motivoCierre, setMotivoCierre] = useState(null)
 
-  //La sesión se guarda aun cuando se recarga
+  // La sesión se guarda en el almacenamiento local para que persista entre recargas de página. Se borra al cerrar sesión o al expirar.
   useEffect(() => {
     if (sesion) {
       localStorage.setItem(
@@ -66,7 +74,7 @@ export function AuthProvider({ children }) {
     try {
       usuarioId = (await obtenerPerfil(respuesta.email, respuesta.token)).id
     } catch {
-      //Si la cuenta no tiene perfil aun, el id queda null
+      // Cuenta sin perfil todavía: el id queda en null
     }
     const nueva = construirSesion(respuesta.token, usuarioId)
     setMotivoCierre(null)
@@ -74,13 +82,58 @@ export function AuthProvider({ children }) {
     return nueva
   }
 
-  // Renuevaa antes de que el token expire y cierra la sesión justo al vencer
+  const registrarse = async ({ nombreCuenta, email, password, perfil }) => {
+    //Cuenta de acceso
+    let duplicado = null
+    try {
+      await crearCuenta({ nombreCuenta, email, password })
+    } catch (error) {
+      error.paso = 'cuenta'
+      if (error.estado !== 409) throw error
+      duplicado = error
+    }
+
+    //Sesión con la cuenta
+    let respuesta
+    try {
+      respuesta = await login(email, password)
+    } catch (error) {
+      throw duplicado ?? error
+    }
+
+    // Si el correo ya existía, solo se sigue cuando la cuenta quedó sin perfil
+    if (duplicado) {
+      let tienePerfil = true
+      try {
+        await obtenerPerfil(email, respuesta.token)
+      } catch (error) {
+        if (error.estado !== 404) throw error
+        tienePerfil = false
+      }
+      if (tienePerfil) throw duplicado
+    }
+
+    //Perfil con teléfono y dirección
+    let usuario
+    try {
+      usuario = await crearPerfil(perfil, respuesta.token)
+    } catch (error) {
+      error.paso = 'perfil'
+      throw error
+    }
+
+    const nueva = construirSesion(respuesta.token, usuario.id)
+    setMotivoCierre(null)
+    setSesion(nueva)
+    return nueva
+  }
+
+  // Renueva antes de que el token expire y cierra la sesión justo al vencer
   const token = sesion?.token
   useEffect(() => {
     if (!token) return
     const payload = decodificarToken(token)
     const duracionMs = payload?.exp && payload?.iat ? (payload.exp - payload.iat) * 1000 : 0
-    // Con tokens cortos (pruebas) el margen se reduce a la mitad de la duración
     const margen = Math.min(MARGEN_RENOVACION_MS, duracionMs / 2)
     const vencimiento = obtenerExpiracionMs(token)
 
@@ -100,7 +153,6 @@ export function AuthProvider({ children }) {
     }
   }, [token, expirarSesion])
 
-  // Un 401 en cualquier petición cierra la sesión
   useEffect(() => {
     window.addEventListener(EVENTO_SESION_EXPIRADA, expirarSesion)
     return () => window.removeEventListener(EVENTO_SESION_EXPIRADA, expirarSesion)
@@ -114,6 +166,7 @@ export function AuthProvider({ children }) {
     motivoCierre,
     tieneRol: (...requeridos) => requeridos.some((rol) => roles.includes(rol)),
     iniciarSesion,
+    registrarse,
     cerrarSesion,
     cerrarAviso
   }

@@ -56,3 +56,13 @@ export function renovarToken(token) {
 export function obtenerPerfil(email, token) {
   return llamar('/users/email/' + encodeURIComponent(email), { token })
 }
+
+// Registro: ruta pública. El backend ignora cualquier rol y asigna ROLE_USER.
+export function crearCuenta({ nombreCuenta, email, password }) {
+  return llamar('/auths', { metodo: 'POST', cuerpo: { nombreCuenta, email, password } })
+}
+
+// Perfil de contacto y despacho (requiere sesión)
+export function crearPerfil(perfil, token) {
+  return llamar('/users', { metodo: 'POST', cuerpo: perfil, token })
+}
