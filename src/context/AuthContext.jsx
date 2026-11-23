@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react'
 import {
   EVENTO_SESION_EXPIRADA,
   login,
@@ -7,6 +7,7 @@ import {
   crearCuenta,
   crearPerfil
 } from '../services/authService'
+import { configurarSesion } from '../services/apiClient'
 import { decodificarToken, obtenerExpiracionMs, tokenVencido } from '../utils/jwt'
 
 const CLAVE_SESION = 'gamehub_sesion'
@@ -151,6 +152,11 @@ export function AuthProvider({ children }) {
       clearTimeout(renovar)
       clearTimeout(vencer)
     }
+  }, [token, expirarSesion])
+
+  // apiClient usa el token de la sesion
+  useLayoutEffect(() => {
+    configurarSesion({ obtenerToken: () => token ?? null, alNoAutorizado: expirarSesion })
   }, [token, expirarSesion])
 
   useEffect(() => {
