@@ -138,6 +138,24 @@ async function crearOrden(cliente, lineas, totales, { usuarioId, codigoCupon } =
   return aOrden({ ...orden, estado }, { pagos: [pago], nombres })
 }
 
+export async function obtenerOrdenesPorEstado(estado) {
+  const datos = await api.get(`/ordenes/estado/${estado}`, { protegida: true })
+  const ordenes = await Promise.all(
+    extraerLista(datos).map(async (orden) => {
+      const [pagos, despachos] = await Promise.all([
+        obtenerPagosPorOrden(orden.id),
+        obtenerDespachosPorOrden(orden.id)
+      ])
+      return { ...(await aOrden(orden, { pagos, despachos })), usuarioId: orden.userId }
+    })
+  )
+  return ordenes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+}
+
+export function cambiarEstadoOrden(id, estado) {
+  return api.put(`/ordenes/${id}/estado`, { estado }, { protegida: true })
+}
+
 // reintento sobre una orden pendiente
 async function pagarOrden(orden, metodo) {
   return registrarPago(orden.id, orden.total, metodo)

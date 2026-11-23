@@ -32,3 +32,7 @@ export function crearInventario(productoId, stock) {
     ubicacion: 'Bodega Santiago'
   }, { protegida: true })
 }
+
+export function ajustarStock(id, stockDisponible) {
+  return api.patch(`/inventories/${id}/cantidad`, { stockDisponible }, { protegida: true })
+}

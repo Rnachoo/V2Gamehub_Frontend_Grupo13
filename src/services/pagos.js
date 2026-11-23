@@ -9,3 +9,15 @@ export function registrarPago(ordenId, monto, metodo) {
 export async function obtenerPagosPorOrden(ordenId) {
   return extraerLista(await api.get(`/payments/orden/${ordenId}`, { protegida: true }))
 }
+
+export async function obtenerPagosPorEstado(estado) {
+  return extraerLista(await api.get(`/payments/estado/${estado}`, { protegida: true }))
+}
+
+export function confirmarPago(id) {
+  return api.patch(`/payments/${id}/estado`, { estado: 'APROBADO' }, { protegida: true })
+}
+
+export function anularPago(id) {
+  return api.patch(`/payments/${id}/anular`, undefined, { protegida: true })
+}
