@@ -1,20 +1,5 @@
 import { api, extraerLista } from './apiClient.js'
 
-export function obtenerResenasPorProducto(idProducto) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(RESENAS.filter((r) => r.idProducto === idProducto))
-    }, RETARDO_MS)
-  })
-}
-export function crearResena({ usuarioId, productoId, ordenId, puntuacion, comentario }) {
-  return api.post(
-    '/resenas',
-    { usuarioId, productoId, ordenId, puntuacion, comentario },
-    { protegida: true }
-  )
-}
-
 export async function obtenerResenasPorProducto(productoId) {
   const datos = await api.get(`/resenas/producto/${productoId}`)
 
@@ -27,4 +12,17 @@ export async function obtenerResenasPorProducto(productoId) {
       comentario: resena.comentario,
       fecha: resena.fecha
     }))
+}
+
+export function crearResena({ usuarioId, productoId, ordenId, puntuacion, comentario }) {
+  return api.post(
+    '/resenas',
+    { usuarioId, productoId, ordenId, puntuacion, comentario },
+    { protegida: true }
+  )
+}
+
+export async function obtenerResenasPorUsuario(usuarioId) {
+  const datos = await api.get(`/resenas/usuario/${usuarioId}`, { protegida: true })
+  return extraerLista(datos)
 }
