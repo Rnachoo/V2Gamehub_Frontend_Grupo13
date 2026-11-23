@@ -7,8 +7,15 @@ const formatoPeso = new Intl.NumberFormat('es-CL', {
   maximumFractionDigits: 0
 })
 
-export default function ResumenCarrito({ lineas, totales, cupon, onAplicarCupon, onVaciar }) {
-  const [codigo, setCodigo] = useState(cupon ? cupon.codigo : '')
+export default function ResumenCarrito({
+  lineas,
+  totales,
+  cupon,
+  onAplicarCupon,
+  onVaciar,
+  bloquearPago = false
+}) {
+  const [codigo, setCodigo] = useState(cupon?.codigo ?? '')
   const [error, setError] = useState('')
 
   async function manejarEnvio(evento) {
@@ -17,10 +24,8 @@ export default function ResumenCarrito({ lineas, totales, cupon, onAplicarCupon,
     setError(mensaje)
   }
 
-  // onVaciar devuelve true si el carrito se vació (el usuario pudo cancelar la confirmación)
   function manejarVaciar() {
-    const seVacio = onVaciar()
-    if (seVacio) {
+    if (onVaciar()) {
       setCodigo('')
       setError('')
     }
@@ -67,6 +72,7 @@ export default function ResumenCarrito({ lineas, totales, cupon, onAplicarCupon,
                   {error}
                 </span>
               </div>
+
               <button type="submit" className="boton-secundario">
                 Aplicar cupón
               </button>
@@ -87,12 +93,19 @@ export default function ResumenCarrito({ lineas, totales, cupon, onAplicarCupon,
               </div>
             </dl>
 
-            <Link to="/checkout" className="boton-primario boton-ir-checkout">
-              Ir a pagar
-            </Link>
+            {bloquearPago ? (
+              <p className="mensaje-error" role="alert">
+                Ajusta las cantidades o quita los productos sin stock disponible
+                para continuar.
+              </p>
+            ) : (
+              <Link to="/checkout" className="boton-primario boton-ir-checkout">
+                Ir a pagar
+              </Link>
+            )}
           </section>
         </div>
       </div>
     </>
   )
-}
+}D
