@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CarruselDestacados from '../components/CarruselDestacados.jsx'
+import EstadoVista from '../components/estados/EstadoVista.jsx'
 import { useCarrito } from '../context/CarritoContext.jsx'
 import { obtenerCategorias } from '../services/categorias.js'
 import { obtenerProductos } from '../services/productos.js'
@@ -16,8 +17,16 @@ const CATEGORIAS_POPULARES = [
 export default function Inicio() {
   const [categorias, setCategorias] = useState([])
   const [productos, setProductos] = useState([])
-  const [errorCarga, setErrorCarga] = useState('')
+  const [cargando, setCargando] = useState(true)
+  const [errorCarga, setErrorCarga] = useState(null)
+  const [intento, setIntento] = useState(0)
   const { lineas, agregar } = useCarrito()
+
+  function reintentar() {
+    setCargando(true)
+    setErrorCarga(null)
+    setIntento(intento + 1)
+  }
 
   // Función para cargar los datos de Inicio
   useEffect(() => {
@@ -30,21 +39,24 @@ export default function Inicio() {
           setProductos(listaProductos)
         }
       })
-      .catch(() => {
-        if (activo) {
-          setErrorCarga('No se pudo cargar el contenido de Inicio.')
-        }
+      .catch((error) => {
+        if (activo) setErrorCarga(error)
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
       })
 
     return () => {
       activo = false
     }
-  }, [])
+  }, [intento])
 
   // Función para elegir las cuatro categorías populares
   const categoriasPopulares = CATEGORIAS_POPULARES
     .map((id) => categorias.find((categoria) => categoria.id === id))
     .filter(Boolean)
+
+  const destacados = productos.filter((producto) => producto.destacado)
 
   // Función para agregar un producto sin superar su stock
   function agregarProducto(producto) {
@@ -74,10 +86,6 @@ export default function Inicio() {
         </div>
       </section>
 
-      {errorCarga && (
-        <p className="contenedor" role="alert">{errorCarga}</p>
-      )}
-
       <section
         className="contenedor seccion-inicio"
         aria-labelledby="titulo-categorias"
@@ -87,41 +95,48 @@ export default function Inicio() {
           <h2 id="titulo-categorias">Categorías</h2>
         </div>
 
-        <div className="grid-categorias">
-          {categoriasPopulares.map((categoria) => {
-            const producto = productos.find(
-              (item) => item.categoria === categoria.id
-            )
+        <EstadoVista
+          cargando={cargando}
+          error={errorCarga}
+          textoCarga="Cargando categorías..."
+          alReintentar={reintentar}
+        >
+          <div className="grid-categorias">
+            {categoriasPopulares.map((categoria) => {
+              const producto = productos.find(
+                (item) => item.categoria === categoria.id
+              )
 
-            return (
-              <article className="categoria-destacada" key={categoria.id}>
-                <div className="contenido-categoria">
-                  <div>
-                    <h3>{categoria.nombre}</h3>
-                    <p>{categoria.descripcion}</p>
+              return (
+                <article className="categoria-destacada" key={categoria.id}>
+                  <div className="contenido-categoria">
+                    <div>
+                      <h3>{categoria.nombre}</h3>
+                      <p>{categoria.descripcion}</p>
+                    </div>
+
+                    <Link
+                      to={`/catalogo?categoria=${categoria.id}`}
+                      className="enlace-categoria"
+                    >
+                      Ver productos →
+                    </Link>
                   </div>
 
-                  <Link
-                    to={`/catalogo?categoria=${categoria.id}`}
-                    className="enlace-categoria"
-                  >
-                    Ver productos →
-                  </Link>
-                </div>
-
-                <div className="imagen-categoria">
-                  {producto && (
-                    <img
-                      src={producto.imagenes[0]}
-                      alt=""
-                      loading="lazy"
-                    />
-                  )}
-                </div>
-              </article>
-            )
-          })}
-        </div>
+                  <div className="imagen-categoria">
+                    {producto && (
+                      <img
+                        src={producto.imagenes[0]}
+                        alt=""
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </EstadoVista>
       </section>
 
       <section
@@ -139,11 +154,15 @@ export default function Inicio() {
           </Link>
         </div>
 
-        <CarruselDestacados
-          productos={productos}
-          lineas={lineas}
-          onAgregar={agregarProducto}
-        />
+        {!cargando && !errorCarga && (
+          <EstadoVista vacio={destacados.length === 0} textoVacio="Pronto tendremos productos destacados.">
+            <CarruselDestacados
+              productos={destacados}
+              lineas={lineas}
+              onAgregar={agregarProducto}
+            />
+          </EstadoVista>
+        )}
       </section>
 
       <section

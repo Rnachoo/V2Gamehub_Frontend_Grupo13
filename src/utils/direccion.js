@@ -1,4 +1,4 @@
-import { REGIONES } from '../data/regiones'
+import { REGIONES } from '../data/regiones.jsx'
 
 export function separarCalleYNumero(direccion) {
   const texto = direccion.trim()

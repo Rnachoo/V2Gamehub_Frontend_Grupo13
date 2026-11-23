@@ -1,107 +1,168 @@
-import { leerProductosActualizados } from './productos.js'
+import { api, extraerLista } from './apiClient.js'
+import { registrarPago, obtenerPagosPorOrden } from './pagos.js'
+import { obtenerDespachosPorOrden } from './despachos.js'
+import { armarDireccion } from '../utils/direccion.js'
 
-const CLAVE_ORDENES = 'gamehub_ordenes'
-const RETARDO_MS = 200
+export const ESTADOS_ORDEN = {
+  PENDIENTE_PAGO: 'Pendiente de pago',
+  PAGADA: 'Pagada',
+  CANCELADA: 'Cancelada'
+}
 
-function leerOrdenes() {
-  return JSON.parse(
-    localStorage.getItem(CLAVE_ORDENES) || '[]'
+export const ESTADOS_DESPACHO = {
+  PENDIENTE: 'Preparando',
+  EN_CAMINO: 'En camino',
+  ENTREGADO: 'Entregado',
+  CANCELADO: 'Despacho cancelado'
+}
+
+const nombresProducto = new Map()
+
+export function nombreProducto(id) {
+  if (!nombresProducto.has(id)) {
+    nombresProducto.set(
+      id,
+      api.get(`/productos/${id}`).then((producto) => producto.nombre, () => 'Producto #' + id)
+    )
+  }
+  return nombresProducto.get(id)
+}
+
+export function obtenerPerfil(usuarioId) {
+  return api.get(`/users/${usuarioId}`, { protegida: true })
+}
+
+function normalizar(texto) {
+  return String(texto ?? '').trim().toLowerCase()
+}
+
+function mismaDireccion(a, b) {
+  return ['comuna', 'ciudad', 'calle', 'numero'].every((campo) => normalizar(a[campo]) === normalizar(b[campo]))
+}
+
+async function asegurarDireccion(usuarioId, cliente) {
+  const perfil = await obtenerPerfil(usuarioId)
+  const nueva = armarDireccion(cliente)
+  const existe = (perfil.directionsDTO ?? []).some((direccion) => mismaDireccion(direccion, nueva))
+  if (!existe) {
+    await api.patch(`/users/${usuarioId}/directions`, nueva, { protegida: true })
+  }
+}
+
+// despacho vigente o el ultimo
+export function despachoActual(despachos) {
+  const vigentes = despachos.filter((despacho) => despacho.estado !== 'CANCELADO')
+  const lista = vigentes.length > 0 ? vigentes : despachos
+  return lista.length > 0 ? lista[lista.length - 1] : null
+}
+
+export function estadoCombinado(estadoOrden, despacho) {
+  if (estadoOrden === 'PAGADA' && despacho) {
+    return ESTADOS_DESPACHO[despacho.estado] ?? ESTADOS_ORDEN.PAGADA
+  }
+  return ESTADOS_ORDEN[estadoOrden] ?? estadoOrden
+}
+
+async function aOrden(orden, { pagos = [], despachos = [], nombres = new Map() } = {}) {
+  const despacho = despachoActual(despachos)
+  const productos = await Promise.all(
+    (orden.items ?? []).map(async (item) => ({
+      productoId: item.productId,
+      nombre: nombres.get(item.productId) ?? (await nombreProducto(item.productId)),
+      precioUnitario: item.precioUnitario,
+      cantidad: item.cantidad
+    }))
   )
+
+  return {
+    id: orden.id,
+    fecha: orden.fecha,
+    estado: estadoCombinado(orden.estado, despacho),
+    estadoOrden: orden.estado,
+    productos,
+    subtotal: orden.subtotal,
+    descuento: orden.descuento,
+    total: orden.total,
+    pago: pagos.length > 0 ? pagos[pagos.length - 1] : null,
+    despacho
+  }
 }
 
-function obtenerOrdenes() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        resolve(leerOrdenes().reverse())
-      } catch (error) {
-        reject(error)
-      }
-    }, RETARDO_MS)
-  })
+async function obtenerOrdenes(usuarioId) {
+  if (!usuarioId) {
+    return []
+  }
+  const datos = await api.get(`/ordenes/cliente/${usuarioId}`, { protegida: true })
+  const ordenes = await Promise.all(
+    extraerLista(datos).map(async (orden) => {
+      const [pagos, despachos] = await Promise.all([
+        obtenerPagosPorOrden(orden.id),
+        obtenerDespachosPorOrden(orden.id)
+      ])
+      return aOrden(orden, { pagos, despachos })
+    })
+  )
+  return ordenes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
 }
 
-// Registrar esta orden representa confirmar el pago simulado.
-function crearOrden(cliente, lineas, totales) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        if (lineas.length === 0) {
-          throw new Error('El carrito está vacío.')
-        }
+// crea la orden y registra el pago
+async function crearOrden(cliente, lineas, totales, { usuarioId, codigoCupon } = {}) {
+  if (lineas.length === 0) {
+    throw new Error('El carrito está vacío.')
+  }
+  if (!usuarioId) {
+    throw new Error('Tu cuenta no tiene un perfil de cliente para comprar.')
+  }
 
-        const productos = leerProductosActualizados()
-        const cantidades = new Map()
+  await asegurarDireccion(usuarioId, cliente)
 
-        // Validar y agrupar las cantidades por producto.
-        for (const linea of lineas) {
-          if (
-            !Number.isInteger(linea.cantidad) ||
-            linea.cantidad <= 0
-          ) {
-            throw new Error(
-              'Hay una cantidad inválida en el carrito.'
-            )
-          }
+  const orden = await api.post(
+    '/ordenes',
+    {
+      userId: usuarioId,
+      codigoPromocion: codigoCupon || null,
+      items: lineas.map((linea) => ({ productId: linea.productoId, cantidad: linea.cantidad }))
+    },
+    { protegida: true }
+  )
 
-          cantidades.set(
-            linea.productoId,
-            (cantidades.get(linea.productoId) || 0) +
-              linea.cantidad
-          )
-        }
+  let pago
+  try {
+    pago = await registrarPago(orden.id, orden.total, cliente.metodoPago)
+  } catch (error) {
+    pago = { estado: 'ERROR', error }
+  }
 
-        // Revisar toda la compra antes de guardar.
-        for (const [productoId, cantidad] of cantidades) {
-          const producto = productos.find(
-            (item) => item.id === productoId
-          )
+  const nombres = new Map(lineas.map((linea) => [linea.productoId, linea.nombre]))
+  const estado = pago.estado === 'APROBADO' ? 'PAGADA' : orden.estado
+  return aOrden({ ...orden, estado }, { pagos: [pago], nombres })
+}
 
-          if (!producto) {
-            throw new Error(
-              'Uno de los productos ya no existe.'
-            )
-          }
+export async function obtenerOrdenesPorEstado(estado) {
+  const datos = await api.get(`/ordenes/estado/${estado}`, { protegida: true })
+  const ordenes = await Promise.all(
+    extraerLista(datos).map(async (orden) => {
+      const [pagos, despachos] = await Promise.all([
+        obtenerPagosPorOrden(orden.id),
+        obtenerDespachosPorOrden(orden.id)
+      ])
+      return { ...(await aOrden(orden, { pagos, despachos })), usuarioId: orden.userId }
+    })
+  )
+  return ordenes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+}
 
-          if (cantidad > producto.stock) {
-            throw new Error(
-              `${producto.nombre}: quedan ${producto.stock} unidades disponibles.`
-            )
-          }
-        }
+export function cambiarEstadoOrden(id, estado) {
+  return api.put(`/ordenes/${id}/estado`, { estado }, { protegida: true })
+}
 
-        const orden = {
-          id: Math.floor(Math.random() * 90000 + 10000),
-          fecha: new Date().toISOString(),
-          estado: 'En camino',
-          cliente,
-          productos: lineas.map((linea) => ({
-            productoId: linea.productoId,
-            nombre: linea.nombre,
-            precioUnitario: linea.precioUnitario,
-            cantidad: linea.cantidad
-          })),
-          subtotal: totales.subtotal,
-          descuento: totales.descuento,
-          total: totales.total
-        }
-
-        // Al guardar la orden, sus unidades pasan a descontarse
-        // cuando se consulta el inventario.
-        localStorage.setItem(
-          CLAVE_ORDENES,
-          JSON.stringify([...leerOrdenes(), orden])
-        )
-
-        resolve(orden)
-      } catch (error) {
-        reject(error)
-      }
-    }, RETARDO_MS)
-  })
+// reintento sobre una orden pendiente
+async function pagarOrden(orden, metodo) {
+  return registrarPago(orden.id, orden.total, metodo)
 }
 
 export const servicioOrdenes = {
   obtenerOrdenes,
-  crearOrden
+  crearOrden,
+  pagarOrden
 }

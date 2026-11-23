@@ -144,3 +144,76 @@
     }
 }
 
+
+.estado-pendiente {
+    background: rgba(255, 193, 7, 0.15);
+    color: #FFC107;
+    border: 1px solid #FFC107;
+}
+
+.estado-pagada,
+.estado-preparando {
+    background: rgba(102, 192, 244, 0.1);
+    color: var(--color-texto);
+    border: 1px solid rgba(199, 213, 224, 0.4);
+}
+
+.estado-cancelada {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.productos-orden li {
+    flex-direction: column;
+}
+
+.fila-producto-orden {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.boton-resenar {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.etiqueta-resenada {
+    font-size: 0.8rem;
+    color: var(--color-acento);
+}
+
+.formulario-resena {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    border: 1px solid rgba(199, 213, 224, 0.15);
+    border-radius: var(--radio-borde);
+    max-width: 480px;
+}
+
+.formulario-resena textarea {
+    width: 100%;
+}
+
+.acciones-resena,
+.acciones-orden {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.detalle-orden {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(199, 213, 224, 0.1);
+    font-size: 0.9rem;
+}
+
+.detalle-orden p {
+    margin-bottom: 0.25rem;
+    overflow-wrap: anywhere;
+}

@@ -1,30 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { servicioOrdenes } from '../../services/ordenes'
+import { METODO_RECHAZO } from '../../services/pagos'
+import { REGIONES } from '../../data/regiones'
+import { traducirError } from '../../utils/errores'
 import { validarFormularioCheckout } from '../../utils/validaciones'
 import { formatearPrecio } from '../../utils/precios'
-
-const REGIONES = [
-  { codigo: 'XV', nombre: 'Arica y Parinacota' },
-  { codigo: 'I', nombre: 'Tarapacá' },
-  { codigo: 'II', nombre: 'Antofagasta' },
-  { codigo: 'III', nombre: 'Atacama' },
-  { codigo: 'IV', nombre: 'Coquimbo' },
-  { codigo: 'V', nombre: 'Valparaíso' },
-  { codigo: 'RM', nombre: 'Metropolitana de Santiago' },
-  {
-    codigo: 'VI',
-    nombre: "Libertador Gral. Bernardo O'Higgins"
-  },
-  { codigo: 'VII', nombre: 'Maule' },
-  { codigo: 'XVI', nombre: 'Ñuble' },
-  { codigo: 'VIII', nombre: 'Biobío' },
-  { codigo: 'IX', nombre: 'La Araucanía' },
-  { codigo: 'XIV', nombre: 'Los Ríos' },
-  { codigo: 'X', nombre: 'Los Lagos' },
-  { codigo: 'XI', nombre: 'Región de Aysén' },
-  { codigo: 'XII', nombre: 'Región de Magallanes' }
-]
 
 const DATOS_VACIOS = {
   nombre: '',
@@ -39,9 +20,12 @@ const DATOS_VACIOS = {
 export default function FormularioCheckout({
   lineas,
   totales,
-  onConfirmar
+  onConfirmar,
+  usuarioId,
+  codigoCupon,
+  datosIniciales
 }) {
-  const [datos, setDatos] = useState(DATOS_VACIOS)
+  const [datos, setDatos] = useState({ ...DATOS_VACIOS, ...datosIniciales })
   const [tocados, setTocados] = useState({})
   const [enviando, setEnviando] = useState(false)
   const [errorCompra, setErrorCompra] = useState('')
@@ -106,13 +90,15 @@ export default function FormularioCheckout({
       const orden = await servicioOrdenes.crearOrden(
         datos,
         lineas,
-        totales
+        totales,
+        { usuarioId, codigoCupon }
       )
 
       onConfirmar(orden)
     } catch (error) {
       setErrorCompra(
-        error.message || 'No se pudo realizar la compra.'
+        (error.status !== undefined ? traducirError(error) : error.message) ||
+          'No se pudo realizar la compra.'
       )
     } finally {
       setEnviando(false)
@@ -303,6 +289,10 @@ export default function FormularioCheckout({
 
               <option value="transferencia">
                 Transferencia Bancaria
+              </option>
+
+              <option value={METODO_RECHAZO}>
+                Tarjeta de prueba (pago rechazado)
               </option>
             </select>
           </div>
