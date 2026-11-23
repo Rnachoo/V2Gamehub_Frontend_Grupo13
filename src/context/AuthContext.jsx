@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react'
 import {
-  EVENTO_SESION_EXPIRADA,
   login,
   renovarToken,
   obtenerPerfil,
@@ -158,11 +157,6 @@ export function AuthProvider({ children }) {
   useLayoutEffect(() => {
     configurarSesion({ obtenerToken: () => token ?? null, alNoAutorizado: expirarSesion })
   }, [token, expirarSesion])
-
-  useEffect(() => {
-    window.addEventListener(EVENTO_SESION_EXPIRADA, expirarSesion)
-    return () => window.removeEventListener(EVENTO_SESION_EXPIRADA, expirarSesion)
-  }, [expirarSesion])
 
   const roles = sesion?.roles ?? []
   const valor = {
