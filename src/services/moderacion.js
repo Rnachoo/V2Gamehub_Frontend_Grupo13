@@ -1,7 +1,9 @@
 import { api, extraerLista } from './apiClient.js'
 
 export async function obtenerResenasParaModerar(productoId) {
-  const datos = await api.get(`/resenas/producto/${productoId}`)
+const datos = await api.get(`/resenas/admin/producto/${productoId}`, {
+  protegida: true
+})
   return extraerLista(datos).map((resena) => ({
     id: resena.id,
     autor: resena.nombreAutor ?? `Cliente #${resena.usuarioId}`,
