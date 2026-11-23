@@ -52,7 +52,7 @@ export default function PagosOperador() {
 
       <EstadoVista cargando={cargando} error={error} vacio={pagos.length === 0} textoVacio="No hay pagos en este estado." alReintentar={recargar}>
         <div className="table-responsive">
-          <table className="table tabla-admin align-middle">
+          <table className="table tabla-admin tabla-operador align-middle">
             <thead>
               <tr>
                 <th scope="col">Pago</th>
@@ -69,10 +69,10 @@ export default function PagosOperador() {
                     <strong>#{pago.id}</strong>
                     <small className="d-block">{new Date(pago.fecha).toLocaleString('es-CL')}</small>
                   </td>
-                  <td>#{pago.ordenId}</td>
-                  <td>{formatearPrecio(pago.monto)}</td>
-                  <td>{TEXTO_METODO[pago.metodo] ?? pago.metodo}</td>
-                  <td className="acciones-tabla">
+                  <td data-label="Orden">#{pago.ordenId}</td>
+                  <td data-label="Monto">{formatearPrecio(pago.monto)}</td>
+                  <td data-label="Método">{TEXTO_METODO[pago.metodo] ?? pago.metodo}</td>
+                  <td className="acciones-tabla" data-label="Acciones">
                     {pago.estado === 'RECHAZADO' && (
                       <button
                         type="button"

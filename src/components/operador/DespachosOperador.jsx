@@ -64,7 +64,7 @@ export default function DespachosOperador() {
 
       <EstadoVista cargando={cargando} error={error} vacio={despachos.length === 0} textoVacio="No hay despachos en este estado." alReintentar={recargar}>
         <div className="table-responsive">
-          <table className="table tabla-admin align-middle">
+          <table className="table tabla-admin tabla-operador align-middle">
             <thead>
               <tr>
                 <th scope="col">Despacho</th>
@@ -80,8 +80,8 @@ export default function DespachosOperador() {
                     <strong>#{despacho.id}</strong>
                     <small className="d-block">Orden #{despacho.ordenId} · {despacho.transportista}</small>
                   </td>
-                  <td>{despacho.direccion}</td>
-                  <td>
+                  <td data-label="Dirección">{despacho.direccion}</td>
+                  <td data-label="Seguimiento">
                     {despacho.tracking || (despacho.estado === 'PENDIENTE' && (
                       <input
                         className="form-control"
@@ -92,7 +92,7 @@ export default function DespachosOperador() {
                       />
                     )) || '—'}
                   </td>
-                  <td className="acciones-tabla">
+                  <td className="acciones-tabla" data-label="Acciones">
                     {SIGUIENTE[despacho.estado] && (
                       <button type="button" className="boton-primario" onClick={() => avanzar(despacho)}>
                         {SIGUIENTE[despacho.estado].texto}
