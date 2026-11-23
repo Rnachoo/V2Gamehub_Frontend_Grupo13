@@ -46,7 +46,7 @@ export default function InventarioOperador() {
 
       <EstadoVista cargando={cargando} error={error} vacio={productos.length === 0} textoVacio="No hay productos." alReintentar={recargar}>
         <div className="table-responsive">
-          <table className="table tabla-admin align-middle">
+          <table className="table tabla-admin tabla-operador align-middle">
             <thead>
               <tr>
                 <th scope="col">Producto</th>
@@ -62,8 +62,8 @@ export default function InventarioOperador() {
                     <strong>{producto.nombre}</strong>
                     <small className="d-block">{producto.marca}</small>
                   </td>
-                  <td>{producto.stock}</td>
-                  <td>
+                  <td data-label="Stock actual">{producto.stock}</td>
+                  <td data-label="Nuevo stock">
                     <input
                       type="number"
                       min="0"
@@ -75,7 +75,7 @@ export default function InventarioOperador() {
                       disabled={!producto.inventarioId}
                     />
                   </td>
-                  <td className="acciones-tabla">
+                  <td className="acciones-tabla" data-label="Acciones">
                     <button
                       type="button"
                       className="boton-secundario"

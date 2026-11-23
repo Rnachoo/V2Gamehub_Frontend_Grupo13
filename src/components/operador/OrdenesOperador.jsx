@@ -79,7 +79,7 @@ export default function OrdenesOperador() {
         alReintentar={recargar}
       >
         <div className="table-responsive">
-          <table className="table tabla-admin align-middle">
+          <table className="table tabla-admin tabla-operador align-middle">
             <thead>
               <tr>
                 <th scope="col">Orden</th>
@@ -98,19 +98,19 @@ export default function OrdenesOperador() {
                       Cliente #{orden.usuarioId} · {new Date(orden.fecha).toLocaleDateString('es-CL')}
                     </small>
                   </td>
-                  <td>
+                  <td data-label="Productos">
                     {orden.productos.map((producto) => (
                       <small className="d-block" key={producto.productoId}>
                         {producto.cantidad}x {producto.nombre}
                       </small>
                     ))}
                   </td>
-                  <td>{formatearPrecio(orden.total)}</td>
-                  <td>
+                  <td data-label="Total">{formatearPrecio(orden.total)}</td>
+                  <td data-label="Estado">
                     <span className="etiqueta-estado">{orden.estado}</span>
                     {orden.despacho?.tracking && <small className="d-block">{orden.despacho.tracking}</small>}
                   </td>
-                  <td className="acciones-tabla">
+                  <td className="acciones-tabla" data-label="Acciones">
                     {orden.estadoOrden === 'PAGADA' && (!orden.despacho || orden.despacho.estado === 'CANCELADO') && (
                       <button type="button" className="boton-primario" onClick={() => setDespachando(orden)}>
                         Generar despacho

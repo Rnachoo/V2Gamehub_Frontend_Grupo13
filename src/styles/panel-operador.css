@@ -1,0 +1,49 @@
+/* panel del operador */
+
+@media (max-width: 575.98px) {
+    .tabla-operador thead {
+        display: none;
+    }
+
+    .tabla-operador,
+    .tabla-operador tbody,
+    .tabla-operador tr,
+    .tabla-operador td {
+        display: block;
+        width: 100%;
+    }
+
+    .tabla-operador tr {
+        border: 1px solid rgba(199, 213, 224, 0.15);
+        border-radius: var(--radio-borde);
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .tabla-operador td {
+        border: 0;
+        padding: 0.25rem 0;
+    }
+
+    .tabla-operador td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    .tabla-operador td.acciones-tabla::before {
+        display: none;
+    }
+
+    .tabla-operador .acciones-tabla {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .tabla-operador .input-stock {
+        max-width: none;
+    }
+}
