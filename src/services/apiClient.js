@@ -10,10 +10,6 @@ export function configurarSesion({ obtenerToken, alNoAutorizado }) {
   if (alNoAutorizado) alSesionInvalida = alNoAutorizado
 }
 
-export function obtenerTokenActual() {
-  return obtenerTokenSesion()
-}
-
 export class ErrorApi extends Error {
   constructor(status, mensaje, campos = null) {
     super(mensaje)
