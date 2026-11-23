@@ -1,6 +1,10 @@
 import { api, ErrorApi, extraerLista } from './apiClient.js'
 import { obtenerTodasLasCategorias } from './categorias.js'
-import { crearInventario, obtenerInventario, obtenerInventarioPorProducto } from './inventario.js'
+import {
+  crearInventario,
+  obtenerInventario,
+  obtenerInventarioPorProducto
+} from './inventario.js'
 
 let ultimosProductos = []
 
@@ -29,7 +33,7 @@ async function categoriasPorIdBackend() {
   return new Map(categorias.map((categoria) => [categoria.idBackend, categoria]))
 }
 
-// Incluye los productos desactivados: lo usa el panel de administración
+// El panel de administración también necesita los productos desactivados.
 export async function obtenerTodosLosProductos() {
   const [datos, categorias, inventario] = await Promise.all([
     api.get('/productos'),
@@ -40,6 +44,12 @@ export async function obtenerTodosLosProductos() {
   return extraerLista(datos).map((producto) =>
     aProducto(producto, categorias, inventario.get(producto.id))
   )
+}
+
+export async function obtenerProductos() {
+  const productos = await obtenerTodosLosProductos()
+  ultimosProductos = productos.filter((producto) => producto.activo)
+  return ultimosProductos
 }
 
 export async function obtenerProductoPorId(id) {
@@ -63,22 +73,7 @@ export async function obtenerProductoPorId(id) {
   return aProducto(producto, categorias, inventario)
 }
 
-export async function obtenerProductoPorId(id) {
-  try {
-    const [producto, categorias, inventario] = await Promise.all([
-      api.get(`/productos/${Number(id)}`),
-      categoriasPorIdBackend(),
-      obtenerInventarioPorProducto(Number(id))
-    ])
-    const resultado = aProducto(producto, categorias, inventario)
-    return resultado.activo ? resultado : null
-  } catch (error) {
-    if (error instanceof ErrorApi && error.status === 404) return null
-    throw error
-  }
-}
-
-// Compatibilidad con services/ordenes.js de EP2 mientras se conecta al backend
+// Compatibilidad con el servicio de órdenes.
 export function leerProductosActualizados() {
   return ultimosProductos
 }
