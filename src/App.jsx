@@ -7,6 +7,7 @@ import Checkout from './pages/Checkout'
 import MisOrdenes from './pages/MisOrdenes'
 import CrearCuenta from './pages/CrearCuenta'
 import PanelAdmin from './pages/PanelAdmin'
+import PanelOperador from './pages/PanelOperador'
 import Cabecera from './components/Cabecera'
 import PieDePagina from './components/PieDePagina'
 import Login from './pages/Login'
@@ -31,6 +32,10 @@ function App() {
           <Route element={<RutaProtegida />}>
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/mis-ordenes" element={<MisOrdenes />} />
+          </Route>
+
+          <Route element={<RutaProtegida roles={['ROLE_OPERADOR', 'ROLE_ADMIN']} />}>
+            <Route path="/panel-operador" element={<PanelOperador />} />
           </Route>
 
           <Route element={<RutaProtegida roles={['ROLE_ADMIN']} />}>

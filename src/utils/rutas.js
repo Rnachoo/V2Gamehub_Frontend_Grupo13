@@ -1,4 +1,4 @@
-export const PANELES_LISTOS = false
+export const PANELES_LISTOS = true
 
 // A dónde lleva cada rol después de iniciar sesión
 export function inicioSegunRoles(roles) {
