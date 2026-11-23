@@ -1,5 +1,5 @@
 import { api, extraerLista } from './apiClient.js'
-import { RESENAS } from '../data/datos-resenas'
+import { RESENAS } from '../data/datos-resenas.jsx'
 
 const RETARDO_MS = 200
 

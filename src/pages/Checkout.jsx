@@ -13,12 +13,32 @@ import { formatearPrecio } from '../utils/precios'
 
 const ESPERA_REDIRECCION_MS = 3000
 
+function baseRegion(texto) {
+  return String(texto ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/^region (de )?/, '')
+    .trim()
+}
+
+function buscarRegion(ciudad) {
+  const buscada = baseRegion(ciudad)
+  if (!buscada) {
+    return null
+  }
+  return REGIONES.find((r) => {
+    const nombre = baseRegion(r.nombre)
+    return nombre.startsWith(buscada) || buscada.startsWith(nombre)
+  })
+}
+
 function datosDesdePerfil(perfil) {
   if (!perfil) {
     return {}
   }
   const direccion = perfil.directionsDTO?.[perfil.directionsDTO.length - 1]
-  const region = REGIONES.find((r) => r.nombre === direccion?.ciudad)
+  const region = buscarRegion(direccion?.ciudad)
   return {
     nombre: perfil.nombreUser ?? '',
     correo: perfil.email ?? '',
