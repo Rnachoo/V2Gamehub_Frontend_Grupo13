@@ -1,7 +1,4 @@
 import { api, extraerLista } from './apiClient.js'
-import { RESENAS } from '../data/datos-resenas.jsx'
-
-const RETARDO_MS = 200
 
 export function obtenerResenasPorProducto(idProducto) {
   return new Promise((resolve) => {
@@ -18,6 +15,16 @@ export function crearResena({ usuarioId, productoId, ordenId, puntuacion, coment
   )
 }
 
-export async function obtenerResenasPorUsuario(usuarioId) {
-  return extraerLista(await api.get(`/resenas/usuario/${usuarioId}`, { protegida: true }))
+export async function obtenerResenasPorProducto(productoId) {
+  const datos = await api.get(`/resenas/producto/${productoId}`)
+
+  return extraerLista(datos)
+    .filter((resena) => resena.estado === 'Active')
+    .map((resena) => ({
+      id: resena.id,
+      autor: resena.nombreAutor || 'Usuario',
+      calificacion: resena.puntuacion,
+      comentario: resena.comentario,
+      fecha: resena.fecha
+    }))
 }
