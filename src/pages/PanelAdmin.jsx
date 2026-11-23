@@ -5,7 +5,6 @@ import CuentasAdmin from '../components/admin/CuentasAdmin.jsx'
 import ProductosAdmin from '../components/admin/ProductosAdmin.jsx'
 import PromocionesAdmin from '../components/admin/PromocionesAdmin.jsx'
 import ResenasAdmin from '../components/admin/ResenasAdmin.jsx'
-import { obtenerTokenActual } from '../services/apiClient.js'
 
 const PESTANAS = [
   { id: 'productos', texto: 'Productos', Componente: ProductosAdmin },
@@ -15,30 +14,9 @@ const PESTANAS = [
   { id: 'cuentas', texto: 'Cuentas', Componente: CuentasAdmin }
 ]
 
-// Respaldo visual: la protección real está en RutaProtegida y en el backend (403).
-function esAdmin() {
-  try {
-    const payload = JSON.parse(atob(obtenerTokenActual().split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
-    return payload.exp * 1000 > Date.now() && payload.roles?.includes('ROLE_ADMIN')
-  } catch {
-    return false
-  }
-}
-
 export default function PanelAdmin() {
   const [activa, setActiva] = useState(PESTANAS[0].id)
   const { Componente } = PESTANAS.find((pestana) => pestana.id === activa)
-
-  if (!esAdmin()) {
-    return (
-      <div className="contenedor panel-admin">
-        <div className="estado-vista estado-vista-error" role="alert">
-          <p>Esta sección es solo para administradores.</p>
-          <Link to="/" className="boton-secundario">Volver al inicio</Link>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="contenedor panel-admin">
