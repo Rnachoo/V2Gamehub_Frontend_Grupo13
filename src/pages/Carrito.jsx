@@ -5,6 +5,7 @@ import { buscarCupon } from '../services/cupones.js'
 import { obtenerProductos } from '../services/productos.js'
 import { cuponVigente } from '../utils/carrito.js'
 import { traducirError } from '../utils/errores.js'
+import { cuponVigente, validarStock } from '../utils/carrito.js'
 import EstadoVista from '../components/estados/EstadoVista'
 import LineaCarrito from '../components/carrito/LineaCarrito'
 import ResumenCarrito from '../components/carrito/ResumenCarrito'
@@ -83,6 +84,13 @@ function CarritoConProductos({ carrito }) {
     return true
   }
 
+  const productosPorId = new Map(productos.map((producto) => [producto.id, producto]))
+
+  const hayLineasSinStockSuficiente = lineas.some((linea) => {
+    const producto = productosPorId.get(linea.productoId)
+    return !producto || !validarStock(producto, linea.cantidad)
+  })
+
   return (
     <EstadoVista
       cargando={cargandoProductos}
@@ -109,8 +117,7 @@ function CarritoConProductos({ carrito }) {
               <LineaCarrito
                 key={linea.productoId}
                 linea={linea}
-                producto={productos.find((producto) => producto.id === linea.productoId)}
-                onCambiarCantidad={cambiarCantidad}
+                producto={productosPorId.get(linea.productoId)}                onCambiarCantidad={cambiarCantidad}
                 onQuitar={quitar}
               />
             ))}
@@ -124,6 +131,7 @@ function CarritoConProductos({ carrito }) {
         cupon={cupon}
         onAplicarCupon={aplicarCuponPorCodigo}
         onVaciar={manejarVaciar}
+        bloquearPago={hayLineasSinStockSuficiente}
       />
     </EstadoVista>
   )
