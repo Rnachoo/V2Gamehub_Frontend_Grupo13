@@ -47,14 +47,14 @@ export function validarStock(producto, cantidadDeseada) {
 
 // Descuento por porcentaje, con tope del cupón y nunca mayor al subtotal
 export function aplicarCupon(subtotal, cupon) {
-  let descuento = subtotal * (cupon.porcentajeDescuento / 100);
-  if (descuento > cupon.tope) {
-    descuento = cupon.tope;
-  }
-  if (descuento > subtotal) {
-    descuento = subtotal;
-  }
-  return descuento;
+  if (subtotal < (cupon.montoMinimo ?? 0)) return 0
+
+  const tipo = cupon.tipo?.toUpperCase() ?? 'PORCENTAJE'
+  const valor = cupon.valor ?? cupon.porcentajeDescuento
+  const descuento = tipo === 'PORCENTAJE' ? subtotal * valor / 100 : valor
+  const descuentoConTope = Math.min(descuento, cupon.tope ?? Infinity)
+
+  return Math.min(Math.round(descuentoConTope), subtotal)
 }
 
 // El cupón es válido si la fecha está dentro de su rango (por defecto, hoy)
