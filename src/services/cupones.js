@@ -1,18 +1,13 @@
-import { CUPONES } from '../data/datos-cupones'
-    
-const RETARDO_MS = 200
+import { api } from './apiClient.js'
 
-// Busca un cupón por código (ignora mayúsculas y espacios). Resuelve null si no existe.
-export function buscarCupon(codigo) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!codigo) {
-        resolve(null)
-        return
-      }
-      const codigoNormalizado = codigo.trim().toUpperCase()
-      const cupon = CUPONES.find((c) => c.codigo === codigoNormalizado)
-      resolve(cupon || null)
-    }, RETARDO_MS)
-  })
+export async function buscarCupon(codigo) {
+  const codigoNormalizado = codigo.trim().toUpperCase()
+  if (!codigoNormalizado) return null
+
+  try {
+    return await api.get(`/promociones/codigo/${encodeURIComponent(codigoNormalizado)}`)
+  } catch (error) {
+    if (error.status === 404) return null
+    throw error
+  }
 }

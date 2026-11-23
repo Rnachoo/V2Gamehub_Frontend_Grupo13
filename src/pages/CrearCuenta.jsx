@@ -28,11 +28,19 @@ const CAMPOS_BACKEND = {
 
 function interpretarError(error) {
   if (error.estado === 409) {
-    return error.paso === 'perfil'
-      ? { campos: { telefono: 'Ese teléfono ya está asociado a otra cuenta.' }, general: '' }
-      : { campos: { correo: 'Ese correo ya está registrado. Puedes iniciar sesión.' }, general: '' }
-  }
+    if (error.paso === 'perfil') {
+      return {
+        campos: {},
+        general: error.message || 'Ya existe un perfil con esos datos.'
+      }
+    }
 
+    return {
+      campos: { correo: 'Ese correo ya está registrado. Puedes iniciar sesión.' },
+      general: ''
+    }
+  }
+  
   if (error.estado === 400 && error.detalle && !error.detalle.mensaje) {
     const campos = {}
     for (const [campoServidor, mensaje] of Object.entries(error.detalle)) {

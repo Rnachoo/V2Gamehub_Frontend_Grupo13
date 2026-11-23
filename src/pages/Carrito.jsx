@@ -5,6 +5,7 @@ import { obtenerProductos } from '../services/productos.js'
 import { cuponVigente } from '../utils/carrito'
 import LineaCarrito from '../components/carrito/LineaCarrito'
 import ResumenCarrito from '../components/carrito/ResumenCarrito'
+import { traducirError } from '../utils/errores.js'
 import '../styles/carrito.css'
 
 export default function Carrito() {
@@ -44,18 +45,24 @@ export default function Carrito() {
   }, [])
 
   async function aplicarCuponPorCodigo(codigo) {
-    const cuponEncontrado = await buscarCupon(codigo)
+    if (!codigo.trim()) return 'Ingresa un código de cupón.'
 
-    if (!cuponEncontrado) {
-      return 'Ese cupón no existe.'
+    try {
+      const encontrado = await buscarCupon(codigo)
+
+      if (!encontrado) return 'Ese cupón no existe.'
+      if (encontrado.estado !== 'Active') return 'Ese cupón está desactivado.'
+      if (!cuponVigente(encontrado)) return 'Ese cupón no está vigente.'
+      if (!(encontrado.usosMaximos > 0)) return 'Ese cupón ya no tiene usos disponibles.'
+      if (totales.subtotal < encontrado.montoMinimo) {
+        return 'Tu carrito aún no alcanza el monto mínimo de ese cupón.'
+      }
+
+      guardarCupon(encontrado)
+      return ''
+    } catch (error) {
+      return traducirError(error)
     }
-
-    if (!cuponVigente(cuponEncontrado)) {
-      return 'Ese cupón está vencido.'
-    }
-
-    guardarCupon(cuponEncontrado)
-    return ''
   }
 
   function manejarVaciar() {

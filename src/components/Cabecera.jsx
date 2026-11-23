@@ -1,4 +1,3 @@
-import { startTransition } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCarrito } from '../context/CarritoContext'
@@ -54,8 +53,8 @@ export default function Cabecera() {
 
 
   function salir() {
-    navegar('/')
-    startTransition(() => auth.cerrarSesion())
+    auth.cerrarSesion()
+    navegar('/', { replace: true })
   }
 
   return (
