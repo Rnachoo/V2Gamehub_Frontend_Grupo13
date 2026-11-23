@@ -4,6 +4,7 @@ import { obtenerProductoPorId } from '../services/productos.js'
 import { obtenerResenasPorProducto } from '../services/resenas'
 import { useCarrito } from '../context/CarritoContext'
 import { validarStock } from '../utils/carrito'
+import EstadoVista from '../components/estados/EstadoVista'
 import ListaResenas from '../components/producto/ListaResenas'
 import '../styles/producto.css'
 
@@ -20,17 +21,23 @@ export default function Producto() {
   const [producto, setProducto] = useState(null)
   const [cargandoProducto, setCargandoProducto] = useState(true)
   const [errorProducto, setErrorProducto] = useState('')
-  const [resenas, setResenas] = useState([])
+  const [resultadoResenas, setResultadoResenas] = useState(null)
   const [cantidad, setCantidad] = useState('1')
   const [error, setError] = useState('')
   const [agregado, setAgregado] = useState(false)
 
   useEffect(() => {
+    if (!Number.isSafeInteger(id) || id <= 0) return
+
     let activo = true
 
-    obtenerResenasPorProducto(id).then((lista) => {
-      if (activo) setResenas(lista)
-    })
+    obtenerResenasPorProducto(id)
+      .then((datos) => {
+        if (activo) setResultadoResenas({ id, datos, error: null })
+      })
+      .catch((error) => {
+        if (activo) setResultadoResenas({ id, datos: [], error })
+      })
 
     return () => {
       activo = false
@@ -250,7 +257,13 @@ export default function Producto() {
         </div>
       </article>
 
-      <ListaResenas resenas={resenas} />
+      <EstadoVista
+        cargando={resultadoResenas?.id !== id}
+        error={resultadoResenas?.id === id ? resultadoResenas.error : null}
+        textoCarga="Cargando reseñas..."
+      >
+        <ListaResenas resenas={resultadoResenas?.datos ?? []} />
+      </EstadoVista>
     </div>
   )
 }
