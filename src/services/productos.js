@@ -42,10 +42,25 @@ export async function obtenerTodosLosProductos() {
   )
 }
 
-export async function obtenerProductos() {
-  const productos = await obtenerTodosLosProductos()
-  ultimosProductos = productos.filter((producto) => producto.activo)
-  return ultimosProductos
+export async function obtenerProductoPorId(id) {
+  const productoId = Number(id)
+  let producto
+
+  try {
+    producto = await api.get(`/productos/${productoId}`)
+  } catch (error) {
+    if (error instanceof ErrorApi && error.status === 404) return null
+    throw error
+  }
+
+  if (producto.estado !== 'Activo') return null
+
+  const [categorias, inventario] = await Promise.all([
+    categoriasPorIdBackend(),
+    obtenerInventarioPorProducto(productoId)
+  ])
+
+  return aProducto(producto, categorias, inventario)
 }
 
 export async function obtenerProductoPorId(id) {
