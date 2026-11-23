@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { obtenerProductoPorId } from '../services/productos.js'
-import { obtenerResenasPorProducto } from '../services/resenas'
+import { obtenerResenasPorProducto } from '../services/resenas.js'
 import { useCarrito } from '../context/CarritoContext'
-import { validarStock } from '../utils/carrito'
+import { validarStock } from '../utils/carrito.js'
 import EstadoVista from '../components/estados/EstadoVista'
 import ListaResenas from '../components/producto/ListaResenas'
 import '../styles/producto.css'
@@ -16,52 +16,34 @@ const formatoPeso = new Intl.NumberFormat('es-CL', {
 
 export default function Producto() {
   const id = Number(useParams().id)
+
+  // Al cambiar de producto se reinician la ficha, la cantidad y las reseñas.
+  return <FichaProducto key={id} id={id} />
+}
+
+function FichaProducto({ id }) {
   const { lineas, agregar } = useCarrito()
+  const idValido = Number.isSafeInteger(id) && id > 0
 
   const [producto, setProducto] = useState(null)
-  const [cargandoProducto, setCargandoProducto] = useState(true)
-  const [errorProducto, setErrorProducto] = useState('')
+  const [cargandoProducto, setCargandoProducto] = useState(idValido)
+  const [errorProducto, setErrorProducto] = useState(null)
   const [resultadoResenas, setResultadoResenas] = useState(null)
   const [cantidad, setCantidad] = useState('1')
-  const [error, setError] = useState('')
+  const [errorCantidad, setErrorCantidad] = useState('')
   const [agregado, setAgregado] = useState(false)
 
   useEffect(() => {
-    if (!Number.isSafeInteger(id) || id <= 0) return
+    if (!idValido) return
 
     let activo = true
-
-    obtenerResenasPorProducto(id)
-      .then((datos) => {
-        if (activo) setResultadoResenas({ id, datos, error: null })
-      })
-      .catch((error) => {
-        if (activo) setResultadoResenas({ id, datos: [], error })
-      })
-
-    return () => {
-      activo = false
-    }
-  }, [id])
-
-  useEffect(() => {
-    let activo = true
-
-    setCargandoProducto(true)
-    setErrorProducto('')
-    setProducto(null)
-    setCantidad('1')
-    setError('')
-    setAgregado(false)
 
     obtenerProductoPorId(id)
       .then((resultado) => {
         if (activo) setProducto(resultado)
       })
-      .catch(() => {
-        if (activo) {
-          setErrorProducto('No se pudo cargar el producto.')
-        }
+      .catch((error) => {
+        if (activo) setErrorProducto(error)
       })
       .finally(() => {
         if (activo) setCargandoProducto(false)
@@ -70,83 +52,81 @@ export default function Producto() {
     return () => {
       activo = false
     }
-  }, [id])
+  }, [id, idValido])
 
-  if (cargandoProducto) {
-    return (
-      <p className="contenedor">
-        Cargando producto...
-      </p>
-    )
-  }
+  useEffect(() => {
+    if (!producto) return
 
-  if (errorProducto) {
-    return (
-      <p className="contenedor" role="alert">
-        {errorProducto}
-      </p>
-    )
-  }
+    let activo = true
 
-  if (!producto) {
+    obtenerResenasPorProducto(id)
+      .then((datos) => {
+        if (activo) setResultadoResenas({ datos, error: null })
+      })
+      .catch((error) => {
+        if (activo) setResultadoResenas({ datos: [], error })
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [id, producto])
+
+  useEffect(() => {
+    if (!agregado) return
+
+    const temporizador = setTimeout(() => setAgregado(false), 1500)
+    return () => clearTimeout(temporizador)
+  }, [agregado])
+
+  if (cargandoProducto || errorProducto || !producto) {
     return (
       <div className="contenedor">
-        <p className="mt-4">
-          No encontramos ese producto. Vuelve al{' '}
-          <Link to="/catalogo">catálogo</Link>.
-        </p>
+        <EstadoVista
+          cargando={cargandoProducto}
+          error={errorProducto}
+          vacio={!producto}
+          textoCarga="Cargando producto..."
+          textoVacio="No encontramos ese producto."
+        />
+
+        {!cargandoProducto && (
+          <Link to="/catalogo">Volver al catálogo</Link>
+        )}
       </div>
     )
   }
 
   const tieneDescuento =
-    producto.precioDescuento != null &&
-    producto.precioDescuento < producto.precio
-
+    producto.precioDescuento != null && producto.precioDescuento < producto.precio
   const sinStock = producto.stock === 0
 
   function manejarEnvio(evento) {
     evento.preventDefault()
 
     const unidades = Number(cantidad)
-
     if (!Number.isInteger(unidades) || unidades <= 0) {
-      setError(
-        'Ingresa una cantidad válida (un número entero mayor a 0).'
-      )
+      setErrorCantidad('Ingresa un número entero mayor a 0.')
       return
     }
 
-    const linea = lineas.find(
-      (item) => item.productoId === producto.id
-    )
-
-    const enCarrito = linea ? linea.cantidad : 0
+    const linea = lineas.find((item) => item.productoId === producto.id)
+    const enCarrito = linea?.cantidad ?? 0
 
     if (!validarStock(producto, unidades + enCarrito)) {
-      const disponiblesParaAgregar = Math.max(
-        0,
-        producto.stock - enCarrito
-      )
-
-      setError(
-        `Puedes agregar ${disponiblesParaAgregar} unidades más al carrito.`
-      )
+      const disponiblesParaAgregar = Math.max(0, producto.stock - enCarrito)
+      setErrorCantidad(`Puedes agregar ${disponiblesParaAgregar} unidades más al carrito.`)
       return
     }
 
-    setError('')
+    setErrorCantidad('')
     agregar(producto, unidades)
     setAgregado(true)
-    setTimeout(() => setAgregado(false), 1500)
   }
 
   return (
     <div className="contenedor">
-      <nav
-        aria-label="Ruta de navegación"
-        className="ruta-navegacion"
-      >
+      <nav aria-label="Ruta de navegación" className="ruta-navegacion">
         <Link to="/">Inicio</Link> &gt;{' '}
         <Link to="/catalogo">Catálogo</Link> &gt;{' '}
         <span aria-current="page">Producto</span>
@@ -173,37 +153,22 @@ export default function Producto() {
               </span>
             )}
 
-            <span
-              className={
-                tieneDescuento
-                  ? 'precio-descuento'
-                  : undefined
-              }
-            >
+            <span className={tieneDescuento ? 'precio-descuento' : undefined}>
               {formatoPeso.format(
-                tieneDescuento
-                  ? producto.precioDescuento
-                  : producto.precio
+                tieneDescuento ? producto.precioDescuento : producto.precio
               )}
             </span>
           </p>
 
-          <ul
-            className="caracteristicas"
-            aria-label="Características del producto"
-          >
+          <ul className="caracteristicas" aria-label="Características del producto">
             {producto.especificaciones.map((caracteristica) => (
-              <li key={caracteristica}>
-                {caracteristica}
-              </li>
+              <li key={caracteristica}>{caracteristica}</li>
             ))}
           </ul>
 
           <p>
             Disponibilidad:{' '}
-            {producto.stock > 0
-              ? `${producto.stock} disponibles`
-              : 'Agotado'}
+            {producto.stock > 0 ? `${producto.stock} disponibles` : 'Agotado'}
           </p>
 
           <form
@@ -212,9 +177,7 @@ export default function Producto() {
             noValidate
           >
             <div className="campo-formulario">
-              <label htmlFor="cantidad-producto">
-                Cantidad:
-              </label>
+              <label htmlFor="cantidad-producto">Cantidad:</label>
 
               <input
                 type="number"
@@ -225,41 +188,26 @@ export default function Producto() {
                 max={producto.stock}
                 value={cantidad}
                 disabled={sinStock}
-                onChange={(evento) => {
-                  setCantidad(evento.target.value)
-                }}
+                onChange={(evento) => setCantidad(evento.target.value)}
                 aria-describedby="error-cantidad"
-                aria-invalid={error ? 'true' : undefined}
+                aria-invalid={errorCantidad ? 'true' : undefined}
               />
 
-              <span
-                id="error-cantidad"
-                className="mensaje-error"
-                role="alert"
-                aria-live="polite"
-              >
-                {error}
+              <span id="error-cantidad" className="mensaje-error" role="alert">
+                {errorCantidad}
               </span>
             </div>
 
-            <button
-              type="submit"
-              className="boton-primario"
-              disabled={sinStock}
-            >
-              {sinStock
-                ? 'Sin stock'
-                : agregado
-                  ? '¡Agregado!'
-                  : 'Agregar al carrito'}
+            <button type="submit" className="boton-primario" disabled={sinStock}>
+              {sinStock ? 'Sin stock' : agregado ? '¡Agregado!' : 'Agregar al carrito'}
             </button>
           </form>
         </div>
       </article>
 
       <EstadoVista
-        cargando={resultadoResenas?.id !== id}
-        error={resultadoResenas?.id === id ? resultadoResenas.error : null}
+        cargando={!resultadoResenas}
+        error={resultadoResenas?.error}
         textoCarga="Cargando reseñas..."
       >
         <ListaResenas resenas={resultadoResenas?.datos ?? []} />
