@@ -9,21 +9,33 @@ import CrearCuenta from './pages/CrearCuenta'
 import PanelAdmin from './pages/PanelAdmin'
 import Cabecera from './components/Cabecera'
 import PieDePagina from './components/PieDePagina'
+import Login from './pages/Login'
+import RutaProtegida from './components/RutaProtegida'
+import AvisoSesion from './components/AvisoSesion'
 
 function App() {
   return (
     <>
       <Cabecera />
+      <AvisoSesion />
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/producto/:id" element={<Producto />} />
           <Route path="/carrito" element={<Carrito />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/mis-ordenes" element={<MisOrdenes />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/crear-cuenta" element={<CrearCuenta />} />
-          <Route path="/panel-admin" element={<PanelAdmin />} />
+
+          {/* Exigen sesión iniciada */}
+          <Route element={<RutaProtegida />}>
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/mis-ordenes" element={<MisOrdenes />} />
+          </Route>
+
+          <Route element={<RutaProtegida roles={['ROLE_ADMIN']} />}>
+            <Route path="/panel-admin" element={<PanelAdmin />} />
+          </Route>
         </Routes>
       </main>
       <PieDePagina />
